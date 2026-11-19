@@ -142,15 +142,7 @@ aside a{cursor:pointer}
 #mem{min-width:760px}#mem td select{min-width:300px}#mem td input{min-width:200px;text-align:left}
 
 .backbtn{width:40px;height:40px;min-height:0;flex:none;border-radius:50%;display:grid;place-items:center;font-size:18px;padding:0;background:var(--card);border:1px solid var(--bd)}
-.watpl{font:inherit;font-size:14px;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:10px;width:100%;resize:vertical;white-space:pre-wrap}
-.wrow{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--bd)}
-.wrow:last-child{border-bottom:0}
-.wrow input[type=checkbox]{width:24px;height:24px;accent-color:var(--g);flex:none;margin-top:2px;min-height:0}
-.wname{font-weight:600;font-size:14px}
-.wphone{font-size:12px;color:var(--mu)}
-.wphone.bad{color:var(--bad)}
-.wmsg{margin-top:6px;font:inherit;font-size:13px;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;width:100%;resize:vertical;white-space:pre-wrap}
-.wsend{width:auto;margin-top:6px;padding:6px 12px;font-size:13px}
+.watpl{font:inherit;font-size:14px;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:10px;width:100%;resize:vertical;white-space:pre-wrap;min-height:220px}
 .toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(12px);background:var(--ch);color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,.25)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(min-width:800px){.toast{bottom:24px}}
@@ -238,27 +230,18 @@ aside a{cursor:pointer}
   <div class="hero">
     <span class="eyebrow"><i></i>WHATSAPP</span>
     <h1>WhatsApp <b>Reminders</b></h1>
-    <p>Edit the reminder message for a round, pick the members to send it to, then tap Share &mdash; each selected member&rsquo;s chat opens with the message ready, ready for you to tap Send in WhatsApp.</p>
-    <span class="pill"><i></i>10 members</span>
-    <div class="chip c1">EDIT <i></i></div><div class="chip c2">SELECT <i></i></div>
+    <p>Pick a round, edit the one message everyone will get, then tap Share to open WhatsApp&rsquo;s own share screen and choose who to send it to.</p>
+    <span class="pill"><i></i>One message for everyone</span>
+    <div class="chip c1">EDIT <i></i></div><div class="chip c2">SHARE <i></i></div>
   </div>
   <div class="card">
     <div class="row">
       <div><label>Round</label><select id="waRound"></select></div>
     </div>
-    <label style="margin-top:12px">Message (editable &mdash; {pay} and {due} are filled in per member)</label>
-    <textarea id="waTpl" class="watpl" rows="10"></textarea>
-    <p class="sub" style="margin:8px 0 0">Placeholders: {week} {weekTa} {amt} {taken} {pay} {due}</p>
-  </div>
-  <div class="card" style="margin-top:14px">
-    <div class="sec" style="margin-bottom:10px">
-      <div><h2 style="margin:0">Members</h2><p class="sub" style="margin:0">Select who to send this round&rsquo;s message to</p></div>
-      <span class="sp"></span>
-      <button id="waSelAll" type="button" style="width:auto">Select all</button>
-    </div>
-    <div id="waList"></div>
-    <div class="bar"><button id="waShare" type="button" class="go" style="width:auto">Share with selected</button></div>
-    <p class="sub" id="waNote" style="margin-top:8px"></p>
+    <label style="margin-top:12px">Message</label>
+    <textarea id="waMsg" class="watpl" rows="10"></textarea>
+    <p class="sub" style="margin:8px 0 0">Changing the round refills this with that round&rsquo;s details &mdash; edit freely after that, it won&rsquo;t be overwritten.</p>
+    <div class="bar"><button id="waShare" type="button" class="go" style="width:auto">Share on WhatsApp</button></div>
   </div>
 </section>
 
@@ -294,9 +277,8 @@ applyTheme(TH);
 var N=10,MODE=null;
 var ENORD=['First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth','Ninth','Tenth'];
 var TAORD=['முதல்','இரண்டாம்','மூன்றாம்','நான்காம்','ஐந்தாம்','ஆறாம்','ஏழாம்','எட்டாம்','ஒன்பதாம்','பத்தாம்'];
-function waDefaultTpl(){return "Week :- {week}\nAuction amount :- {amt}\nTaken by : {taken}\nSeetu Amount : {pay}\nLast date to pay : {due}\n\n{weekTa} வாரம்.\nஏல தொகை : {amt} \nசீட்டு தொகை : {pay} \nஏலம் எடுத்து : {taken}"}
 function def(f){var n=[],R=[];for(var i=0;i<N;i++){n.push('Member '+(i+1));R.push({t:-1,a:'',p:'',f:'',b:''})}
- return {amt:1000,freq:f||'weekly',share:'remaining',start:new Date().toISOString().slice(0,10),names:n,phones:n.map(function(){return ''}),rounds:R,paid:{},over:{},mode:{},waTpl:waDefaultTpl()}}
+ return {amt:1000,freq:f||'weekly',share:'remaining',start:new Date().toISOString().slice(0,10),names:n,phones:n.map(function(){return ''}),rounds:R,paid:{},over:{},mode:{},waMsg:''}}
 function loadMode(f){var x=def(f),raw=null;try{raw=localStorage.getItem('seettu-'+f);if(!raw&&f==='weekly')raw=localStorage.getItem('seettu-v2');if(raw)x=Object.assign(def(f),JSON.parse(raw))}catch(e){}x.freq=f;return x}
 var ST={weekly:loadMode('weekly'),monthly:loadMode('monthly')},S=ST.weekly;
 function save(){try{localStorage.setItem('seettu-'+MODE,JSON.stringify(S))}catch(e){}}
@@ -435,23 +417,16 @@ function render(){
  $('mem').innerHTML=mh;
  renderWA();
 }
-function waMsg(tpl,r,m){var R=S.rounds[r],taken=R.t>=0?S.names[R.t]:'—';
- var vars={week:ENORD[r]+' week',weekTa:TAORD[r],amt:Math.round(amtR(r)),taken:taken,pay:Math.round(pay(m,r)),due:fmt(dueDate(r))};
- return tpl.replace(/\{(\w+)\}/g,function(_,k){return vars.hasOwnProperty(k)?vars[k]:''})}
-function waDigits(phone){var d=(phone||'').replace(/[^0-9]/g,'');if(d.length===10)d='91'+d;return d}
-function waLink(phone,text){var d=waDigits(phone);if(d.length<11)return null;return 'https://wa.me/'+d+'?text='+encodeURIComponent(text)}
-var WAR=null,WASEL={};
+function waResolvedMsg(r){var R=S.rounds[r],taken=R.t>=0?S.names[R.t]:'—',i=info(r);
+ var pay=Math.round(i.grp.length?amtR(r)-i.div:amtR(r)),amt=Math.round(amtR(r));
+ return "Week :- "+ENORD[r]+" week\nAuction amount :- "+amt+"\nTaken by : "+taken+"\nSeetu Amount : "+pay+"\nLast date to pay : "+fmt(dueDate(r))+"\n\n"+TAORD[r]+" வாரம்.\nஏல தொகை : "+amt+" \nசீட்டு தொகை : "+pay+" \nஏலம் எடுத்து : "+taken}
+var WAR=null;
 function renderWA(){var $=function(i){return document.getElementById(i)};
  if(WAR===null||WAR<0||WAR>=N)WAR=cur();
  var selEl=$('waRound');
  if(selEl){var oh='';for(var r=0;r<N;r++)oh+='<option value="'+r+'"'+(r===WAR?' selected':'')+'>Round '+(r+1)+' · '+fmt(rdate(r))+'</option>';selEl.innerHTML=oh}
- var tplBox=$('waTpl');
- if(tplBox&&document.activeElement!==tplBox)tplBox.value=has(S.waTpl)?S.waTpl:waDefaultTpl();
- var tpl=(tplBox&&tplBox.value)||S.waTpl||waDefaultTpl();
- var listHtml='',m;
- for(m=0;m<N;m++){var phone=(S.phones||[])[m]||'',ok=waDigits(phone).length>=11,msg=waMsg(tpl,WAR,m),checked=!!WASEL[m];
-  listHtml+='<div class="wrow"><input type="checkbox" data-wam="'+m+'"'+(checked&&ok?' checked':'')+(ok?'':' disabled')+'><div style="flex:1;min-width:0"><div class="wname">'+esc(S.names[m])+'</div><div class="wphone'+(ok?'':' bad')+'">'+(ok?esc(phone):'No phone number — add one on the Members page')+'</div><textarea class="wmsg" rows="7" readonly>'+esc(msg)+'</textarea></div></div>'}
- var lst=$('waList');if(lst)lst.innerHTML=listHtml}
+ var box=$('waMsg');
+ if(box&&document.activeElement!==box)box.value=(S.waMsg&&S.waMsg.length)?S.waMsg:waResolvedMsg(WAR)}
 document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  if(t.id==='amt'){S.amt=Math.max(0,+t.value||0);S.rounds.forEach(function(x){x.p='';x.f='';x.b='';x.pm='';x.pt=''});S.over={}}
  else if(t.id==='freq')S.freq=t.value;
@@ -471,27 +446,17 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  else if(d.mr!==undefined){var mq=+d.mr;S.rounds.forEach(function(x){if(x.t===mq){x.t=-1;x.a=''}});if(t.value!=='')S.rounds[+t.value].t=mq}
  else if(d.ph!==undefined)S.phones[d.ph]=t.value.replace(/[^0-9+\s-]/g,'');
  else if(d.n!==undefined)S.names[d.n]=t.value||('Member '+(+d.n+1));
- else if(t.id==='waRound'){WAR=+t.value;render();return}
- else if(d.wam!==undefined){WASEL[d.wam]=t.checked;render();return}
- else if(t.id==='waTpl'){S.waTpl=t.value;save();render();return}
+ else if(t.id==='waRound'){WAR=+t.value;S.waMsg='';save();render();return}
+ else if(t.id==='waMsg'){S.waMsg=t.value;save();return}
  else return;
  save();render()});
 document.getElementById('reset').onclick=function(){
  if(!confirm('Clear all names, auctions and payments?'))return;S=ST[MODE]=def(MODE);save();render()};
-document.getElementById('waSelAll').onclick=function(){
- var m,anyUnsel=false;
- for(m=0;m<N;m++){if(waDigits((S.phones||[])[m]||'').length>=11&&!WASEL[m]){anyUnsel=true;break}}
- for(m=0;m<N;m++)if(waDigits((S.phones||[])[m]||'').length>=11)WASEL[m]=anyUnsel;
- render()};
 document.getElementById('waShare').onclick=function(){
- var tpl=document.getElementById('waTpl').value||S.waTpl||waDefaultTpl();
- S.waTpl=tpl;save();
- var sent=0,skipped=0,m;
- for(m=0;m<N;m++){if(!WASEL[m])continue;var phone=(S.phones||[])[m]||'',msg=waMsg(tpl,WAR,m),link=waLink(phone,msg);
-  if(!link){skipped++;continue}
-  window.open(link,'_blank');sent++}
- if(!sent&&!skipped){toast('Select at least one member first')}
- else toast('Opened WhatsApp for '+sent+' member'+(sent===1?'':'s')+(skipped?' · '+skipped+' skipped (no phone)':''))};
+ var msg=document.getElementById('waMsg').value||'';
+ if(!msg.trim()){toast('Message is empty');return}
+ S.waMsg=msg;save();
+ window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')};
 render();if(!fromHash())route();
 </script>
 </body>
