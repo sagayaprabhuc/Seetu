@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Seettu Tracker</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 <style>
 :root{--ch:#1f2430;--g:#269B55;--gd:#187341;--g2:#6fcf97;--sb1:#063b30;--sb2:#052b24;--ml:#7dffb0;--bg:#F6F7FB;--card:#fff;--tx:#1b1f2a;--mu:#6b7280;--bd:#e3e6ee;--am:#E7A23B;--rd:#D9534F;--ok:#187341;--bad:#D9534F;--mix:#fff;
 --pg:color-mix(in srgb,var(--g) 11%,var(--mix));--hl:var(--pg);--h1:color-mix(in srgb,var(--g) 9%,var(--mix));--h2:color-mix(in srgb,var(--g) 22%,var(--mix));--hb:color-mix(in srgb,var(--g) 26%,var(--mix));--gl:color-mix(in srgb,var(--g) 18%,transparent);
@@ -61,7 +63,8 @@ td select.md{width:72px;min-width:72px;padding:3px 4px;font-size:12px;min-height
 #app{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
 aside{order:0;position:sticky;top:0;bottom:auto;height:100vh;padding:18px 12px;flex-direction:column;overflow-x:visible;border-top:none;border-right:1px solid rgba(255,255,255,.08)}
 .logo{display:flex;font-weight:700;font-size:18px;gap:8px;align-items:center;color:#fff;margin:0 8px 26px;min-height:40px}
-.logo i{width:26px;height:26px;background:var(--g);border-radius:6px;display:inline-block;clip-path:polygon(50% 0,100% 100%,0 100%)}
+.logo img{width:28px;height:28px;border-radius:7px;display:block}
+.avlogo{width:32px;height:32px;border-radius:50%;flex:none}
 aside a{display:block;justify-content:flex-start;padding:11px 13px;margin-bottom:4px;min-height:auto}
 .top{padding:12px 24px}
 .top b{font-size:15px}
@@ -137,22 +140,37 @@ aside a{cursor:pointer}
 .swb{width:34px;height:34px;padding:0;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--bd)}
 .swb.on{box-shadow:0 0 0 2px var(--tx)}
 #mem{min-width:760px}#mem td select{min-width:300px}#mem td input{min-width:200px;text-align:left}
+
+.backbtn{width:40px;height:40px;min-height:0;flex:none;border-radius:50%;display:grid;place-items:center;font-size:18px;padding:0;background:var(--card);border:1px solid var(--bd)}
+.watpl{font:inherit;font-size:14px;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:10px;width:100%;resize:vertical;white-space:pre-wrap}
+.wrow{display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--bd)}
+.wrow:last-child{border-bottom:0}
+.wrow input[type=checkbox]{width:24px;height:24px;accent-color:var(--g);flex:none;margin-top:2px;min-height:0}
+.wname{font-weight:600;font-size:14px}
+.wphone{font-size:12px;color:var(--mu)}
+.wphone.bad{color:var(--bad)}
+.wmsg{margin-top:6px;font:inherit;font-size:13px;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:8px;width:100%;resize:vertical;white-space:pre-wrap}
+.wsend{width:auto;margin-top:6px;padding:6px 12px;font-size:13px}
+.toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(12px);background:var(--ch);color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,.25)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+@media(min-width:800px){.toast{bottom:24px}}
 </style>
 </head>
 <body>
 <div id="app">
 <aside>
-  <div class="logo" data-go="home" style="cursor:pointer"><i></i>Seettu Tracker</div>
+  <div class="logo" data-go="home" style="cursor:pointer"><img src="logo.png" alt="">Seettu Tracker</div>
   <div class="mbadge" id="mbadge"></div>
   <a href="#" data-go="dashboard" class="on">Dashboard</a>
   <a href="#" data-go="members">Members</a>
   <a href="#" data-go="auction">Auction &amp; Balance</a>
   <a href="#" data-go="payments">Payment Tracker</a>
+  <a href="#" data-go="whatsapp">WhatsApp</a>
   <a href="#" data-go="setup">Settings</a>
   <a href="#" data-go="home" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px">&#8646; Switch weekly / monthly</a>
 </aside>
 <div>
-<div class="top"><b id="topt">Seettu Tracker</b><span class="sp"></span>
+<div class="top"><button id="backBtn" class="backbtn" aria-label="Back" hidden>&#8592;</button><b id="topt">Seettu Tracker</b><span class="sp"></span>
   <div style="text-align:right;line-height:1.2"><b>10 members</b><br><small id="topsub" style="color:var(--mu)">Weekly &amp; monthly</small></div><div class="av">S10</div></div>
 <main>
 
@@ -216,6 +234,34 @@ aside a{cursor:pointer}
   <div class="wrap"><table id="grid"></table></div>
 </section>
 
+<section id="v-whatsapp" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i>WHATSAPP</span>
+    <h1>WhatsApp <b>Reminders</b></h1>
+    <p>Edit the reminder message for a round, pick the members to send it to, then tap Share &mdash; each selected member&rsquo;s chat opens with the message ready, ready for you to tap Send in WhatsApp.</p>
+    <span class="pill"><i></i>10 members</span>
+    <div class="chip c1">EDIT <i></i></div><div class="chip c2">SELECT <i></i></div>
+  </div>
+  <div class="card">
+    <div class="row">
+      <div><label>Round</label><select id="waRound"></select></div>
+    </div>
+    <label style="margin-top:12px">Message (editable &mdash; {pay} and {due} are filled in per member)</label>
+    <textarea id="waTpl" class="watpl" rows="10"></textarea>
+    <p class="sub" style="margin:8px 0 0">Placeholders: {week} {weekTa} {amt} {taken} {pay} {due}</p>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="sec" style="margin-bottom:10px">
+      <div><h2 style="margin:0">Members</h2><p class="sub" style="margin:0">Select who to send this round&rsquo;s message to</p></div>
+      <span class="sp"></span>
+      <button id="waSelAll" type="button" style="width:auto">Select all</button>
+    </div>
+    <div id="waList"></div>
+    <div class="bar"><button id="waShare" type="button" class="go" style="width:auto">Share with selected</button></div>
+    <p class="sub" id="waNote" style="margin-top:8px"></p>
+  </div>
+</section>
+
 <section id="v-setup" class="view" hidden>
   <div class="hero">
     <span class="eyebrow"><i></i>SETTINGS</span>
@@ -246,8 +292,11 @@ function applyTheme(t){if(!THEMES[t])t='green';var o=THEMES[t],st=document.docum
 var TH='green';try{TH=localStorage.getItem('seettu-theme3')||'green'}catch(e){}
 applyTheme(TH);
 var N=10,MODE=null;
+var ENORD=['First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth','Ninth','Tenth'];
+var TAORD=['முதல்','இரண்டாம்','மூன்றாம்','நான்காம்','ஐந்தாம்','ஆறாம்','ஏழாம்','எட்டாம்','ஒன்பதாம்','பத்தாம்'];
+function waDefaultTpl(){return "Week :- {week}\nAuction amount :- {amt}\nTaken by : {taken}\nSeetu Amount : {pay}\nLast date to pay : {due}\n\n{weekTa} வாரம்.\nஏல தொகை : {amt} \nசீட்டு தொகை : {pay} \nஏலம் எடுத்து : {taken}"}
 function def(f){var n=[],R=[];for(var i=0;i<N;i++){n.push('Member '+(i+1));R.push({t:-1,a:'',p:'',f:'',b:''})}
- return {amt:1000,freq:f||'weekly',share:'remaining',start:new Date().toISOString().slice(0,10),names:n,phones:n.map(function(){return ''}),rounds:R,paid:{},over:{},mode:{}}}
+ return {amt:1000,freq:f||'weekly',share:'remaining',start:new Date().toISOString().slice(0,10),names:n,phones:n.map(function(){return ''}),rounds:R,paid:{},over:{},mode:{},waTpl:waDefaultTpl()}}
 function loadMode(f){var x=def(f),raw=null;try{raw=localStorage.getItem('seettu-'+f);if(!raw&&f==='weekly')raw=localStorage.getItem('seettu-v2');if(raw)x=Object.assign(def(f),JSON.parse(raw))}catch(e){}x.freq=f;return x}
 var ST={weekly:loadMode('weekly'),monthly:loadMode('monthly')},S=ST.weekly;
 function save(){try{localStorage.setItem('seettu-'+MODE,JSON.stringify(S))}catch(e){}}
@@ -257,6 +306,7 @@ function rdate(r){var d=new Date(S.start+'T00:00:00');
  if(S.freq==='weekly')d.setDate(d.getDate()+7*r);else d.setMonth(d.getMonth()+r);return d}
 function fmt(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
 function cur(){var t=new Date();t.setHours(0,0,0,0);var c=0;for(var r=0;r<N;r++)if(rdate(r)<=t)c=r;return c}
+function dueDate(r){var d;if(r+1<N){d=new Date(rdate(r+1));d.setDate(d.getDate()-1)}else{d=new Date(rdate(r));if(S.freq==='weekly')d.setDate(d.getDate()+6);else{d.setMonth(d.getMonth()+1);d.setDate(d.getDate()-1)}}return d}
 function info(r){var R=S.rounds[r],pot=potR(r);
  if(R.t<0&&R.a==='')return {dec:false,A:pot,D:0,grp:[],div:0};
  var A=R.a===''?pot:Math.min(pot,Math.max(0,+R.a)),grp=[],m;
@@ -275,7 +325,7 @@ function pay(m,r){var k=m+'-'+r;if(has(S.over[k]))return +S.over[k];
  return amtR(r)-(g?i.div:0)}
 function mb(a){var x=Math.max.apply(null,a)||1;return '<div class="mb">'+a.map(function(v){return '<i style="height:'+Math.max(10,Math.round(v/x*100))+'%"></i>'}).join('')+'</div>'}
 function kpi(go,cls,ico,label,val,sub,arr,vc){return '<div class="kpi card '+cls+'" data-go="'+go+'"><span class="ico">'+ico+'</span><div><small>'+label+'</small><b class="'+vc+'">'+val+'</b><em>'+sub+'</em></div>'+mb(arr)+'</div>'}
-var VIEWS=['home','dashboard','members','auction','payments','setup'],CUR='home';
+var VIEWS=['home','dashboard','members','auction','payments','whatsapp','setup'],CUR='home';
 function withS(st,fn){var o=S;S=st;try{return fn()}finally{S=o}}
 function totals(){var c=cur(),col=0,pen=0,r,m;for(r=0;r<N;r++){var dc=info(r).dec;for(m=0;m<N;m++){var q=pay(m,r),k=m+'-'+r;if(S.paid[k])col+=q;else if(dc||has(S.over[k]))pen+=q}}
  return {c:c,col:col,pen:pen,pot:S.amt*N,tk:S.rounds[c].t>=0?S.names[S.rounds[c].t]:'Not decided',date:rdate(c)}}
@@ -295,11 +345,36 @@ function applyMode(){var n=MODE==='monthly'?'Monthly':'Weekly';
 function route(){document.getElementById('app').className=CUR==='home'?'home':'';
  VIEWS.forEach(function(v){document.getElementById('v-'+v).hidden=v!==CUR;var a=document.querySelector('aside a[data-go="'+v+'"]');if(a)a.classList.toggle('on',v===CUR)});
  if(CUR==='home'){renderHome();document.getElementById('topt').textContent='Seettu Tracker';document.getElementById('topsub').textContent='Weekly & monthly'}else applyMode();
+ var bb=document.getElementById('backBtn');if(bb)bb.hidden=(CUR==='home');
  window.scrollTo(0,0)}
 function setMode(f){MODE=f;S=ST[f];render()}
-function go(v,f){if(VIEWS.indexOf(v)<0)return;if(v==='home'){MODE=null}else{if(f&&f!==MODE)setMode(f);if(!MODE)return}CUR=v;try{location.hash=v==='home'?'home':MODE+'-'+v}catch(e){}route()}
-function fromHash(){var h=(location.hash||'').slice(1),m=/^(weekly|monthly)-(dashboard|members|auction|payments|setup)$/.exec(h);if(m){setMode(m[1]);CUR=m[2];route();return true}if(h==='home'){MODE=null;CUR='home';route();return true}return false}
+function keyOf(v,f){return v==='home'?'home':f+'-'+v}
+function applyKey(key){if(key==='home'){MODE=null;CUR='home';return true}
+ var m=/^(weekly|monthly)-(dashboard|members|auction|payments|whatsapp|setup)$/.exec(key);if(!m)return false;
+ MODE=m[1];S=ST[MODE];CUR=m[2];return true}
+var NAVSTACK=['home'];
+function go(v,f){if(VIEWS.indexOf(v)<0)return;if(v!=='home'){if(!f)f=MODE;if(!f)return}
+ var key=keyOf(v,f);if(!applyKey(key))return;
+ if(NAVSTACK[NAVSTACK.length-1]!==key)NAVSTACK.push(key);
+ try{location.hash=key}catch(e){}
+ render();route()}
+var EXIT_ARMED=false,EXIT_TIMER=null;
+function exitOrPrompt(){
+ if(EXIT_ARMED){try{if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App&&window.Capacitor.Plugins.App.exitApp)window.Capacitor.Plugins.App.exitApp()}catch(e){}return}
+ EXIT_ARMED=true;toast('Press back again to exit');
+ clearTimeout(EXIT_TIMER);EXIT_TIMER=setTimeout(function(){EXIT_ARMED=false},2000)}
+function toast(msg){var t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t)}
+ t.textContent=msg;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(function(){t.classList.remove('on')},2000)}
+function backNav(){
+ if(NAVSTACK.length>1){NAVSTACK.pop();var prev=NAVSTACK[NAVSTACK.length-1];applyKey(prev);try{location.hash=prev}catch(e){}render();route()}
+ else exitOrPrompt()}
+function fromHash(){var h=(location.hash||'').slice(1)||'home';if(!applyKey(h))return false;
+ if(NAVSTACK[NAVSTACK.length-1]!==h)NAVSTACK.push(h);
+ render();route();return true}
 window.addEventListener('hashchange',fromHash);
+document.getElementById('backBtn').addEventListener('click',backNav);
+try{if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App&&window.Capacitor.Plugins.App.addListener){
+ window.Capacitor.Plugins.App.addListener('backButton',function(){backNav()})}}catch(e){}
 document.addEventListener('click',function(e){var tp=e.target.closest('[data-theme-pick]');if(tp){applyTheme(tp.dataset.themePick);return}var d=e.target.closest('[data-mode]');if(d){e.preventDefault();go('dashboard',d.dataset.mode);return}var g=e.target.closest('[data-go]');if(!g)return;e.preventDefault();go(g.dataset.go)});
 function render(){
  var $=function(i){return document.getElementById(i)},pot=S.amt*N,c=cur(),m,r;
@@ -358,7 +433,25 @@ function render(){
   for(r=0;r<N;r++){var by=S.rounds[r].t,dis=by>=0&&by!==m;ro+='<option value="'+r+'"'+(cr===r?' selected':'')+(dis?' disabled':'')+'>Round '+(r+1)+' · '+fmt(rdate(r))+(dis?' (taken by '+esc(S.names[by])+')':'')+'</option>'}
   mh+='<tr><td>'+(m+1)+'</td><td><input type="text" data-n="'+m+'" value="'+esc(S.names[m])+'" placeholder="Member name"></td><td><input type="tel" data-ph="'+m+'" value="'+esc((S.phones||[])[m]||'')+'" placeholder="Contact number"></td><td><select data-mr="'+m+'">'+ro+'</select></td></tr>'}
  $('mem').innerHTML=mh;
+ renderWA();
 }
+function waMsg(tpl,r,m){var R=S.rounds[r],taken=R.t>=0?S.names[R.t]:'—';
+ var vars={week:ENORD[r]+' week',weekTa:TAORD[r],amt:Math.round(amtR(r)),taken:taken,pay:Math.round(pay(m,r)),due:fmt(dueDate(r))};
+ return tpl.replace(/\{(\w+)\}/g,function(_,k){return vars.hasOwnProperty(k)?vars[k]:''})}
+function waDigits(phone){var d=(phone||'').replace(/[^0-9]/g,'');if(d.length===10)d='91'+d;return d}
+function waLink(phone,text){var d=waDigits(phone);if(d.length<11)return null;return 'https://wa.me/'+d+'?text='+encodeURIComponent(text)}
+var WAR=null,WASEL={};
+function renderWA(){var $=function(i){return document.getElementById(i)};
+ if(WAR===null||WAR<0||WAR>=N)WAR=cur();
+ var selEl=$('waRound');
+ if(selEl){var oh='';for(var r=0;r<N;r++)oh+='<option value="'+r+'"'+(r===WAR?' selected':'')+'>Round '+(r+1)+' · '+fmt(rdate(r))+'</option>';selEl.innerHTML=oh}
+ var tplBox=$('waTpl');
+ if(tplBox&&document.activeElement!==tplBox)tplBox.value=has(S.waTpl)?S.waTpl:waDefaultTpl();
+ var tpl=(tplBox&&tplBox.value)||S.waTpl||waDefaultTpl();
+ var listHtml='',m;
+ for(m=0;m<N;m++){var phone=(S.phones||[])[m]||'',ok=waDigits(phone).length>=11,msg=waMsg(tpl,WAR,m),checked=!!WASEL[m];
+  listHtml+='<div class="wrow"><input type="checkbox" data-wam="'+m+'"'+(checked&&ok?' checked':'')+(ok?'':' disabled')+'><div style="flex:1;min-width:0"><div class="wname">'+esc(S.names[m])+'</div><div class="wphone'+(ok?'':' bad')+'">'+(ok?esc(phone):'No phone number — add one on the Members page')+'</div><textarea class="wmsg" rows="7" readonly>'+esc(msg)+'</textarea></div></div>'}
+ var lst=$('waList');if(lst)lst.innerHTML=listHtml}
 document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  if(t.id==='amt'){S.amt=Math.max(0,+t.value||0);S.rounds.forEach(function(x){x.p='';x.f='';x.b='';x.pm='';x.pt=''});S.over={}}
  else if(t.id==='freq')S.freq=t.value;
@@ -378,10 +471,27 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  else if(d.mr!==undefined){var mq=+d.mr;S.rounds.forEach(function(x){if(x.t===mq){x.t=-1;x.a=''}});if(t.value!=='')S.rounds[+t.value].t=mq}
  else if(d.ph!==undefined)S.phones[d.ph]=t.value.replace(/[^0-9+\s-]/g,'');
  else if(d.n!==undefined)S.names[d.n]=t.value||('Member '+(+d.n+1));
+ else if(t.id==='waRound'){WAR=+t.value;render();return}
+ else if(d.wam!==undefined){WASEL[d.wam]=t.checked;render();return}
+ else if(t.id==='waTpl'){S.waTpl=t.value;save();render();return}
  else return;
  save();render()});
 document.getElementById('reset').onclick=function(){
  if(!confirm('Clear all names, auctions and payments?'))return;S=ST[MODE]=def(MODE);save();render()};
+document.getElementById('waSelAll').onclick=function(){
+ var m,anyUnsel=false;
+ for(m=0;m<N;m++){if(waDigits((S.phones||[])[m]||'').length>=11&&!WASEL[m]){anyUnsel=true;break}}
+ for(m=0;m<N;m++)if(waDigits((S.phones||[])[m]||'').length>=11)WASEL[m]=anyUnsel;
+ render()};
+document.getElementById('waShare').onclick=function(){
+ var tpl=document.getElementById('waTpl').value||S.waTpl||waDefaultTpl();
+ S.waTpl=tpl;save();
+ var sent=0,skipped=0,m;
+ for(m=0;m<N;m++){if(!WASEL[m])continue;var phone=(S.phones||[])[m]||'',msg=waMsg(tpl,WAR,m),link=waLink(phone,msg);
+  if(!link){skipped++;continue}
+  window.open(link,'_blank');sent++}
+ if(!sent&&!skipped){toast('Select at least one member first')}
+ else toast('Opened WhatsApp for '+sent+' member'+(sent===1?'':'s')+(skipped?' · '+skipped+' skipped (no phone)':''))};
 render();if(!fromHash())route();
 </script>
 </body>
