@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Seettu Tracker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{--ch:#1f2430;--g:#269B55;--gd:#187341;--g2:#6fcf97;--sb1:#063b30;--sb2:#052b24;--ml:#7dffb0;--bg:#F6F7FB;--card:#fff;--tx:#1b1f2a;--mu:#6b7280;--bd:#e3e6ee;--am:#E7A23B;--rd:#D9534F;--ok:#187341;--bad:#D9534F;--mix:#fff;
+--pg:color-mix(in srgb,var(--g) 11%,var(--mix));--hl:var(--pg);--h1:color-mix(in srgb,var(--g) 9%,var(--mix));--h2:color-mix(in srgb,var(--g) 22%,var(--mix));--hb:color-mix(in srgb,var(--g) 26%,var(--mix));--gl:color-mix(in srgb,var(--g) 18%,transparent);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14161b;--card:#1c1f26;--tx:#e8eaf0;--mu:#98a0ad;--bd:#2c313a;--mix:#1c1f26;--ok:#4fd184;--bad:#f2867d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14161b;--card:#1c1f26;--tx:#e8eaf0;--mu:#98a0ad;--bd:#2c313a;--mix:#1c1f26;--ok:#4fd184;--bad:#f2867d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg));color:var(--tx);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+#app{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
+aside{background:linear-gradient(180deg,var(--sb1) 0%,var(--sb2) 100%);color:#e6f4ed;padding:18px 12px;position:sticky;top:0;height:100vh;border-right:1px solid rgba(255,255,255,.08)}
+.logo{font-weight:700;font-size:18px;display:flex;gap:8px;align-items:center;color:#fff;margin:0 8px 26px;min-height:40px}
+.logo i{width:26px;height:26px;background:var(--g);border-radius:6px;display:inline-block;clip-path:polygon(50% 0,100% 100%,0 100%)}
+aside a{display:block;padding:11px 13px;border-radius:8px;color:#d5e8df;text-decoration:none;margin-bottom:4px;transition:background .2s ease,transform .2s ease}
+aside a:hover{background:rgba(255,255,255,.1);transform:translateX(2px)}
+aside a.on{background:var(--g);color:#fff}
+.top{display:flex;gap:12px;align-items:center;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--bd)}
+.top b{font-size:15px}.sp{flex:1}
+.av{width:34px;height:34px;border-radius:50%;background:var(--ch);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px}
+main{padding:24px;min-width:0}
+h2{margin:28px 0 2px;font-size:20px}
+h2:first-of-type{margin-top:0}
+.sub{color:var(--mu);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+label{display:block;font-weight:500;font-size:12px;margin:0 0 4px}
+input,select,button{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;width:100%}
+:focus-visible{outline:2px solid #2F6FED;outline-offset:1px}
+button{cursor:pointer;width:auto;font-weight:500;padding:8px 14px}
+button:hover{border-color:var(--g)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:14px}
+.stat b{font-size:24px;display:block;line-height:1.2}
+.stat span{font-size:12px;color:var(--mu)}
+.wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;background:var(--card)}
+table{border-collapse:collapse;width:100%}
+#sched{min-width:1000px}#grid{min-width:1400px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--bd);text-align:center;white-space:nowrap}
+th{font-size:12px;color:var(--mu);font-weight:600;background:var(--card)}
+td:first-child,th:first-child{text-align:left}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:var(--pg)}
+tr.now td{background:var(--hl);box-shadow:inset 0 0 0 0 transparent}
+td input[type=text],td input[type=number],td select{min-width:110px}
+td input[type=checkbox]{width:20px;height:20px;accent-color:var(--g);padding:0}
+td small{display:block;font-size:11px;color:var(--mu)}
+td input.amt{width:88px;min-width:88px;padding:5px 6px;text-align:right}
+td input.ov{border-color:var(--am)}
+.pc{display:flex;gap:4px;align-items:center;justify-content:center;margin-bottom:4px}
+td select.md{width:72px;min-width:72px;padding:3px 4px;font-size:12px}
+.ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
+.bar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:800px){#app{grid-template-columns:1fr}aside{position:static;height:auto;display:flex;overflow-x:auto;gap:4px;padding:10px 12px}aside .logo{display:none}aside a{white-space:nowrap;margin:0}main{padding:16px 12px}.top{padding:10px 14px}}
+
+[hidden]{display:none!important}
+.hero{position:relative;overflow:hidden;background:linear-gradient(120deg,var(--h1),var(--h2));border:1px solid var(--hb);border-radius:20px;padding:30px 34px;min-height:170px;margin-bottom:26px;box-shadow:0 8px 24px var(--gl)}
+.hero:before{content:"";position:absolute;right:-60px;top:-90px;width:380px;height:380px;border-radius:50%;border:2px solid var(--gl)}
+.hero:after{content:"";position:absolute;right:120px;bottom:-170px;width:360px;height:360px;border-radius:50%;border:2px solid var(--gl)}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--gd)}
+.eyebrow i,.pill i,.live i{width:9px;height:9px;border-radius:50%;background:var(--g);display:inline-block;box-shadow:0 0 0 3px var(--gl)}
+.hero h1{font-size:40px;line-height:1.1;margin:10px 0 8px;font-weight:700;position:relative;z-index:1}
+.hero h1 b{color:var(--g)}
+.hero p{max-width:520px;color:var(--mu);margin:0 0 16px;font-size:15px;position:relative;z-index:1}
+.pill{display:inline-flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--hb);border-radius:99px;padding:6px 14px;font-weight:600;font-size:13px;color:var(--gd);position:relative;z-index:1}
+.chip{position:absolute;z-index:1;background:var(--card);border:1px solid var(--hb);border-radius:10px;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:.08em;box-shadow:0 6px 16px rgba(0,0,0,.08);display:flex;gap:8px;align-items:center}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--g)}
+.c1{right:230px;top:26px}.c2{right:60px;top:60px}.c3{right:150px;bottom:26px}
+.sec{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.sec h2{margin:0 0 2px}.sec .sub{margin:0}
+.live{display:inline-flex;gap:8px;align-items:center;background:var(--pg);border:1px solid var(--hb);border-radius:99px;padding:5px 14px;font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--gd);margin-top:6px}
+.kpi{position:relative;overflow:hidden;display:flex;gap:14px;align-items:center;cursor:pointer;padding:18px;transition:transform .2s,box-shadow .2s}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.08);border-color:var(--g)}
+.ico{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:20px;font-weight:700;flex:none}
+.kpi small{display:block;font-weight:600;font-size:13px}
+.kpi b{display:block;font-size:26px;line-height:1.2}
+.kpi em{display:block;font-style:normal;font-size:12px;color:var(--mu)}
+.mb{position:absolute;right:14px;bottom:12px;display:flex;gap:4px;align-items:flex-end;height:38px}
+.mb i{width:6px;border-radius:2px;background:currentColor;opacity:.35}
+.k-g{color:var(--g)}.k-g .ico{background:var(--pg)}
+.k-b{color:#2F6FED}.k-b .ico{background:#e4edff}
+.k-a{color:#E7A23B}.k-a .ico{background:#fdf0dc}
+.k-p{color:#8b5cf6}.k-p .ico{background:#efe7fd}
+.k-r{color:#D9534F}.k-r .ico{background:#fde8e7}
+.kpi small,.kpi b,.kpi em{color:var(--tx)}.kpi em{color:var(--mu)}
+.kpi b.bad{color:var(--bad)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px;margin-top:16px}
+.charts h3{margin:0;font-size:15px}.charts .sub{font-size:12px;margin:2px 0 12px}
+.br{display:grid;grid-template-columns:70px 1fr 74px;gap:10px;align-items:center;margin:9px 0;font-size:13px;cursor:pointer}
+.br u{display:block;height:9px;border-radius:5px;background:var(--bd);overflow:hidden;text-decoration:none}
+.br u s{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:5px}
+.br u s.am{background:linear-gradient(90deg,#E7A23B,#f3c77f)}
+.br span:last-child{text-align:right;font-weight:600}
+.donut{width:140px;height:140px;border-radius:50%;display:grid;place-items:center;margin:6px auto 12px}
+.donut div{width:92px;height:92px;border-radius:50%;background:var(--card);display:grid;place-items:center;text-align:center;font-weight:700;line-height:1.2}
+.donut small{display:block;font-weight:500;color:var(--mu);font-size:11px}
+.leg{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;font-size:13px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+@media(max-width:800px){.chip{display:none}.hero{padding:22px 20px}.hero h1{font-size:30px}}
+
+#app.home{grid-template-columns:1fr}#app.home aside{display:none}
+aside a{cursor:pointer}
+.mbadge{margin:-16px 8px 16px;font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--ml);text-transform:uppercase}
+.home2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));max-width:960px}
+.hc{cursor:pointer;padding:22px;transition:transform .2s,box-shadow .2s}
+.hc:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.09);border-color:var(--g)}
+.hc h3{font-size:20px;margin:0}
+.hrow{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--bd);font-size:14px}
+.hrow span{color:var(--mu)}
+.go{margin-top:16px;width:100%;padding:12px;border-radius:10px;font-weight:600;background:var(--g);color:#fff;border-color:var(--g)}
+.go:hover{background:var(--gd)}
+
+.swatches{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.swb{width:34px;height:34px;padding:0;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--bd)}
+.swb.on{box-shadow:0 0 0 2px var(--tx)}
+#mem{min-width:760px}#mem td select{min-width:300px}#mem td input{min-width:200px;text-align:left}
+</style>
+</head>
+<body>
+<div id="app">
+<aside>
+  <div class="logo" data-go="home" style="cursor:pointer"><i></i>Seettu Tracker</div>
+  <div class="mbadge" id="mbadge"></div>
+  <a href="#" data-go="dashboard" class="on">Dashboard</a>
+  <a href="#" data-go="members">Members</a>
+  <a href="#" data-go="auction">Auction &amp; Balance</a>
+  <a href="#" data-go="payments">Payment Tracker</a>
+  <a href="#" data-go="setup">Settings</a>
+  <a href="#" data-go="home" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px">&#8646; Switch weekly / monthly</a>
+</aside>
+<div>
+<div class="top"><b id="topt">Seettu Tracker</b><span class="sp"></span>
+  <div style="text-align:right;line-height:1.2"><b>10 members</b><br><small id="topsub" style="color:var(--mu)">Weekly &amp; monthly</small></div><div class="av">S10</div></div>
+<main>
+
+<section id="v-home" class="view">
+  <div class="hero">
+    <span class="eyebrow"><i></i>SEETTU</span>
+    <h1>Seettu <b>Management</b></h1>
+    <p>Choose which seettu you want to manage. Weekly and monthly seettus are tracked separately.</p>
+    <span class="pill"><i></i>10 members each</span>
+    <div class="chip c1">WEEKLY <i></i></div><div class="chip c2">MONTHLY <i></i></div><div class="chip c3">&#10003; TRACKED</div>
+  </div>
+  <div class="sec"><div><h2>Choose your seettu</h2><p class="sub">Select one to open its dashboard</p></div></div>
+  <div class="charts home2" id="homeCards"></div>
+</section>
+
+<section id="v-dashboard" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i><span class="mnu">WEEKLY</span>&nbsp;SEETTU</span>
+    <h1><span class="mn">Weekly</span> Seettu <b>Management</b></h1>
+    <p>Track every auction, see who took the pot and what each member still owes, all in one place.</p>
+    <span class="pill"><i></i>10 members</span>
+    <div class="chip c1">AUCTION <i></i></div><div class="chip c2">CASH / GPAY <i></i></div><div class="chip c3">&#10003; TRACKED</div>
+  </div>
+  <div class="sec"><div><h2>Seettu Overview</h2><p class="sub">Live summary from your payments · Select a card to view its records</p></div><span class="sp"></span><span class="live"><i></i>LIVE DATA</span></div>
+  <div class="stats" id="stats"></div>
+  <div class="charts" id="charts"></div>
+</section>
+
+<section id="v-members" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i><span class="mnu">WEEKLY</span>&nbsp;MEMBERS</span>
+    <h1>Seettu <b>Members</b></h1>
+    <p>Add each member&rsquo;s name and contact number. Names are used on the auction and payment pages.</p>
+    <span class="pill"><i></i>10 members</span>
+    <div class="chip c1">NAME <i></i></div><div class="chip c2">CONTACT <i></i></div>
+  </div>
+  <div class="wrap"><table id="mem"></table></div>
+</section>
+
+<section id="v-auction" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i>AUCTION</span>
+    <h1>Auction <b>&amp; Balance</b></h1>
+    <p>Pick who took each round, set the seetu amount received and see what every member pays.</p>
+    <span class="pill"><i></i>10 rounds</span>
+    <div class="chip c1">DISCOUNT <i></i></div><div class="chip c2">BALANCE <i></i></div>
+  </div>
+  <p class="sub">Everything here is editable: auction amount, amount per member, what each member pays, and the balance. Edited boxes get an amber border; clear a box to go back to the automatic value.</p>
+  <div class="wrap"><table id="sched"></table></div>
+</section>
+
+<section id="v-payments" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i>PAYMENTS</span>
+    <h1>Payment <b>Tracker</b></h1>
+    <p>Tick when a member has paid and choose Cash or GPay for each payment.</p>
+    <span class="pill"><i></i>10 members</span>
+    <div class="chip c1">CASH <i></i></div><div class="chip c2">GPAY <i></i></div>
+  </div>
+  <p class="sub">Type any amount in a member&rsquo;s box to change what they owe for that round (clear it to go back to automatic).</p>
+  <div class="wrap"><table id="grid"></table></div>
+</section>
+
+<section id="v-setup" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i>SETTINGS</span>
+    <h1>Seettu <b>Settings</b></h1>
+    <p>Set the amount per member, how often the auction runs and when it starts.</p>
+    <span class="pill"><i></i>Saved in this browser</span>
+  </div>
+  <div class="card">
+    <div class="row">
+      <div><label>Amount per member (&#8377;)</label><input id="amt" type="number" min="0" step="100"></div>
+      <div><label>Frequency</label><input id="freqv" disabled></div>
+      <div><label>First auction date</label><input id="start" type="date"></div>
+      <div><label>Auction discount is shared among</label><select id="share"><option value="remaining">Members yet to take</option><option value="all">All members</option></select></div>
+    </div>
+    <div class="bar"><button id="reset">Reset all</button></div>
+  </div>
+  <div class="card" style="margin-top:14px"><label>Theme colour</label><div class="swatches" id="swatches"><button class="swb" data-theme-pick="red" style="background:#dc2626" title="Red" aria-label="Red theme"></button><button class="swb" data-theme-pick="indigo" style="background:#6366f1" title="Indigo" aria-label="Indigo theme"></button><button class="swb" data-theme-pick="blue" style="background:#2563eb" title="Blue" aria-label="Blue theme"></button><button class="swb" data-theme-pick="purple" style="background:#9333ea" title="Purple" aria-label="Purple theme"></button><button class="swb" data-theme-pick="rose" style="background:#e11d48" title="Rose" aria-label="Rose theme"></button><button class="swb" data-theme-pick="orange" style="background:#f97316" title="Orange" aria-label="Orange theme"></button><button class="swb" data-theme-pick="green" style="background:#269B55" title="Green" aria-label="Green theme"></button></div></div>
+</section>
+
+<p class="sub" style="margin-top:18px">Data is saved in this browser only. Amounts are rounded to the nearest rupee for display.</p>
+</main>
+</div>
+</div>
+<script>
+var THEMES={red:{g:'#dc2626',gd:'#b91c1c',g2:'#fca5a5',sb1:'#450a0a',sb2:'#2f0707',ml:'#fecaca'},indigo:{g:'#6366f1',gd:'#4f46e5',g2:'#a5b4fc',sb1:'#1e1b4b',sb2:'#14123a',ml:'#c7d2fe'},blue:{g:'#2563eb',gd:'#1d4ed8',g2:'#93c5fd',sb1:'#0f2a5c',sb2:'#0a1e44',ml:'#bfdbfe'},purple:{g:'#9333ea',gd:'#7e22ce',g2:'#d8b4fe',sb1:'#2e1065',sb2:'#220b4d',ml:'#e9d5ff'},rose:{g:'#e11d48',gd:'#be123c',g2:'#fda4af',sb1:'#4c0519',sb2:'#370413',ml:'#fecdd3'},orange:{g:'#f97316',gd:'#c2570c',g2:'#fdba74',sb1:'#3b1d0b',sb2:'#2a1407',ml:'#fed7aa'},green:{g:'#269B55',gd:'#187341',g2:'#6fcf97',sb1:'#063b30',sb2:'#052b24',ml:'#7dffb0'}};
+function applyTheme(t){if(!THEMES[t])t='green';var o=THEMES[t],st=document.documentElement.style;for(var k in o)st.setProperty('--'+k,o[k]);try{localStorage.setItem('seettu-theme3',t)}catch(e){}
+ [].forEach.call(document.querySelectorAll('.swb'),function(b){b.classList.toggle('on',b.dataset.themePick===t)})}
+var TH='green';try{TH=localStorage.getItem('seettu-theme3')||'green'}catch(e){}
+applyTheme(TH);
+var N=10,MODE=null;
+function def(f){var n=[],R=[];for(var i=0;i<N;i++){n.push('Member '+(i+1));R.push({t:-1,a:'',p:'',f:'',b:''})}
+ return {amt:1000,freq:f||'weekly',share:'remaining',start:new Date().toISOString().slice(0,10),names:n,phones:n.map(function(){return ''}),rounds:R,paid:{},over:{},mode:{}}}
+function loadMode(f){var x=def(f),raw=null;try{raw=localStorage.getItem('seettu-'+f);if(!raw&&f==='weekly')raw=localStorage.getItem('seettu-v2');if(raw)x=Object.assign(def(f),JSON.parse(raw))}catch(e){}x.freq=f;return x}
+var ST={weekly:loadMode('weekly'),monthly:loadMode('monthly')},S=ST.weekly;
+function save(){try{localStorage.setItem('seettu-'+MODE,JSON.stringify(S))}catch(e){}}
+function esc(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function money(n){return '₹'+Math.round(n).toLocaleString('en-IN')}
+function rdate(r){var d=new Date(S.start+'T00:00:00');
+ if(S.freq==='weekly')d.setDate(d.getDate()+7*r);else d.setMonth(d.getMonth()+r);return d}
+function fmt(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}
+function cur(){var t=new Date();t.setHours(0,0,0,0);var c=0;for(var r=0;r<N;r++)if(rdate(r)<=t)c=r;return c}
+function info(r){var R=S.rounds[r],pot=potR(r);
+ if(R.t<0&&R.a==='')return {dec:false,A:pot,D:0,grp:[],div:0};
+ var A=R.a===''?pot:Math.min(pot,Math.max(0,+R.a)),grp=[],m;
+ if(S.share==='all'){for(m=0;m<N;m++)grp.push(m)}
+ else{var taken={};for(var i=0;i<=r;i++)if(S.rounds[i].t>=0)taken[S.rounds[i].t]=1;
+  for(m=0;m<N;m++)if(!taken[m])grp.push(m)}
+ if(!grp.length)A=pot;
+ var D=pot-A;return {dec:true,A:A,D:D,grp:grp,div:grp.length?D/grp.length:0}}
+function has(v){return v!==undefined&&v!==''&&v!==null&&!isNaN(+v)}
+function amtR(r){var x=S.rounds[r].pm;return has(x)?+x:S.amt}
+function potR(r){var x=S.rounds[r].pt;return has(x)?+x:amtR(r)*N}
+function rmode(r){var a={},b={},m,k,v,any=false;for(m=0;m<N;m++){k=m+'-'+r;v=S.mode[k]==='gpay'?'gpay':'cash';b[v]=1;if(S.paid[k]){a[v]=1;any=true}}var s=any?a:b;return s.cash&&s.gpay?'mixed':(s.gpay?'gpay':'cash')}
+function pay(m,r){var k=m+'-'+r;if(has(S.over[k]))return +S.over[k];
+ var i=info(r),R=S.rounds[r],g=i.grp.indexOf(m)>=0;
+ if(g&&has(R.p))return +R.p;if(!g&&has(R.f))return +R.f;
+ return amtR(r)-(g?i.div:0)}
+function mb(a){var x=Math.max.apply(null,a)||1;return '<div class="mb">'+a.map(function(v){return '<i style="height:'+Math.max(10,Math.round(v/x*100))+'%"></i>'}).join('')+'</div>'}
+function kpi(go,cls,ico,label,val,sub,arr,vc){return '<div class="kpi card '+cls+'" data-go="'+go+'"><span class="ico">'+ico+'</span><div><small>'+label+'</small><b class="'+vc+'">'+val+'</b><em>'+sub+'</em></div>'+mb(arr)+'</div>'}
+var VIEWS=['home','dashboard','members','auction','payments','setup'],CUR='home';
+function withS(st,fn){var o=S;S=st;try{return fn()}finally{S=o}}
+function totals(){var c=cur(),col=0,pen=0,r,m;for(r=0;r<N;r++){var dc=info(r).dec;for(m=0;m<N;m++){var q=pay(m,r),k=m+'-'+r;if(S.paid[k])col+=q;else if(dc||has(S.over[k]))pen+=q}}
+ return {c:c,col:col,pen:pen,pot:S.amt*N,tk:S.rounds[c].t>=0?S.names[S.rounds[c].t]:'Not decided',date:rdate(c)}}
+function renderHome(){var h='';['weekly','monthly'].forEach(function(f){var W=f==='weekly',s=ST[f],t=withS(s,totals),nm=W?'Weekly':'Monthly';
+ function row(a,b,c){return '<div class="hrow"><span>'+a+'</span><b'+(c?' class="'+c+'"':'')+'>'+b+'</b></div>'}
+ h+='<div class="card hc" data-mode="'+f+'"><div class="'+(W?'k-g':'k-b')+'" style="display:flex;gap:14px;align-items:center;margin-bottom:12px"><span class="ico">'+(W?'W':'M')+'</span><div><h3>'+nm+' Seettu</h3><div class="sub" style="margin:0">Auction every '+(W?'week':'month')+'</div></div></div>'+
+  row('Amount per member',money(s.amt))+row('Pot per round',money(t.pot))+row('Current round','Round '+(t.c+1)+' of '+N)+row('Took this round',esc(t.tk))+row('Auction date',fmt(t.date))+row('Collected so far',money(t.col),'ok')+row('Pending',money(t.pen),t.pen>0?'bad':'ok')+
+  '<button class="go">Open '+nm+' dashboard &rarr;</button></div>'});
+ document.getElementById('homeCards').innerHTML=h}
+function applyMode(){var n=MODE==='monthly'?'Monthly':'Weekly';
+ [].forEach.call(document.querySelectorAll('.mn'),function(e){e.textContent=n});
+ [].forEach.call(document.querySelectorAll('.mnu'),function(e){e.textContent=n.toUpperCase()});
+ document.getElementById('topt').textContent=n+' Seettu';
+ document.getElementById('topsub').textContent='Auction every '+(MODE==='monthly'?'month':'week');
+ document.getElementById('freqv').value=n;
+ document.getElementById('mbadge').textContent=n+' seettu'}
+function route(){document.getElementById('app').className=CUR==='home'?'home':'';
+ VIEWS.forEach(function(v){document.getElementById('v-'+v).hidden=v!==CUR;var a=document.querySelector('aside a[data-go="'+v+'"]');if(a)a.classList.toggle('on',v===CUR)});
+ if(CUR==='home'){renderHome();document.getElementById('topt').textContent='Seettu Tracker';document.getElementById('topsub').textContent='Weekly & monthly'}else applyMode();
+ window.scrollTo(0,0)}
+function setMode(f){MODE=f;S=ST[f];render()}
+function go(v,f){if(VIEWS.indexOf(v)<0)return;if(v==='home'){MODE=null}else{if(f&&f!==MODE)setMode(f);if(!MODE)return}CUR=v;try{location.hash=v==='home'?'home':MODE+'-'+v}catch(e){}route()}
+function fromHash(){var h=(location.hash||'').slice(1),m=/^(weekly|monthly)-(dashboard|members|auction|payments|setup)$/.exec(h);if(m){setMode(m[1]);CUR=m[2];route();return true}if(h==='home'){MODE=null;CUR='home';route();return true}return false}
+window.addEventListener('hashchange',fromHash);
+document.addEventListener('click',function(e){var tp=e.target.closest('[data-theme-pick]');if(tp){applyTheme(tp.dataset.themePick);return}var d=e.target.closest('[data-mode]');if(d){e.preventDefault();go('dashboard',d.dataset.mode);return}var g=e.target.closest('[data-go]');if(!g)return;e.preventDefault();go(g.dataset.go)});
+function render(){
+ var $=function(i){return document.getElementById(i)},pot=S.amt*N,c=cur(),m,r;
+ $('amt').value=S.amt;$('start').value=S.start;$('share').value=S.share;
+ var ci=info(c),due=0,got=0,cc=0,cg=0;
+ for(m=0;m<N;m++){var p=pay(m,c);if(S.paid[m+'-'+c]){got+=p;if(S.mode[m+'-'+c]==='gpay')cg+=p;else cc+=p}else due+=p}
+ if(has(S.rounds[c].b))due=+S.rounds[c].b;
+ var tk=S.rounds[c].t>=0?esc(S.names[S.rounds[c].t]):'Not decided';
+ var taken={};S.rounds.forEach(function(x){if(x.t>=0)taken[x.t]=1});
+ var h='<tr><th>Round</th><th>Auction date</th><th>Taken by</th><th>Auction amount</th><th>Amount per member</th><th>Each member pays</th><th>Collected</th><th>Balance to collect</th></tr>';
+ for(r=0;r<N;r++){var i=info(r),R=S.rounds[r],col=0,bal=0,ca=0,gp=0,rm=rmode(r);
+  for(m=0;m<N;m++){var q=pay(m,r);if(S.paid[m+'-'+r]){col+=q;if(S.mode[m+'-'+r]==='gpay')gp+=q;else ca+=q}else bal+=q}
+  var opts='<option value="">— not yet —</option>';
+  for(m=0;m<N;m++)if(!taken[m]||R.t===m)opts+='<option value="'+m+'"'+(R.t===m?' selected':'')+'>'+esc(S.names[m])+'</option>';
+  var lo=has(R.p)?+R.p:amtR(r)-i.div,fu=has(R.f)?+R.f:amtR(r),same=i.grp.length===N||i.D===0;
+  var inF='<input type="number" class="amt'+(has(R.f)?' ov':'')+'" data-f="'+r+'" value="'+Math.round(fu)+'">';
+  var inP='<input type="number" class="amt'+(has(R.p)?' ov':'')+'" data-p="'+r+'" value="'+Math.round(lo)+'">';
+  var pays=!i.dec?inF:(same?inP:inP+'<small>others pay</small>'+inF);
+  h+='<tr'+(r===c?' class="now"':'')+'><td>'+(r+1)+'</td><td>'+fmt(rdate(r))+'</td><td><select data-t="'+r+'">'+opts+'</select></td><td><input type="number" class="amt'+(has(R.pt)?' ov':'')+'" min="0" step="100" data-pt="'+r+'" value="'+Math.round(potR(r))+'"></td><td><input type="number" class="amt'+(has(R.pm)?' ov':'')+'" min="0" step="100" data-pm="'+r+'" value="'+Math.round(amtR(r))+'"></td>'+
+   '<td>'+pays+'</td><td>'+money(col)+'<small>Cash '+money(ca)+' · GPay '+money(gp)+'</small></td>'+
+   '<td><input type="number" class="amt'+(has(R.b)?' ov':'')+((has(R.b)?+R.b:bal)>0?' bad':' ok')+'" data-b="'+r+'" value="'+Math.round(has(R.b)?+R.b:bal)+'"></td></tr>'}
+ $('sched').innerHTML=h;
+ var g='<tr><th>Member</th>';
+ for(r=0;r<N;r++)g+='<th>R'+(r+1)+'<br><small>'+rdate(r).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</small></th>';
+ g+='<th>Pending ₹</th></tr>';
+ for(m=0;m<N;m++){var pend=0;
+  g+='<tr><td><input type="text" data-n="'+m+'" value="'+esc(S.names[m])+'"></td>';
+  for(r=0;r<N;r++){var pp=pay(m,r),pd=S.paid[m+'-'+r];if(!pd&&(info(r).dec||has(S.over[m+'-'+r])))pend+=pp;
+   var md=S.mode[m+'-'+r]==='gpay';g+='<td><div class="pc"><input type="checkbox" data-m="'+m+'" data-r="'+r+'"'+(pd?' checked':'')+'><select class="md" data-d="'+m+'-'+r+'"><option value="cash"'+(md?'':' selected')+'>Cash</option><option value="gpay"'+(md?' selected':'')+'>GPay</option></select></div><input type="number" class="amt'+(has(S.over[m+'-'+r])?' ov':'')+'" data-o="'+m+'-'+r+'" value="'+Math.round(pp)+'"></td>'}
+  g+='<td class="'+(pend>0?'bad':'ok')+'">'+(pend>0?money(pend):'Clear')+'</td></tr>'}
+ $('grid').innerHTML=g;
+
+ var RC=[],RB=[],MP=[],totC=0,totP=0,cash=0,gpay=0;
+ for(m=0;m<N;m++)MP[m]=0;
+ for(r=0;r<N;r++){var cl=0,bl=0,dc=info(r).dec;for(m=0;m<N;m++){var qq=pay(m,r),kk=m+'-'+r;if(S.paid[kk]){cl+=qq;if(S.mode[kk]==='gpay')gpay+=qq;else cash+=qq}else if(dc||has(S.over[kk])){bl+=qq;MP[m]+=qq}}RC.push(cl);RB.push(bl);totC+=cl;totP+=bl}
+ var prog=S.rounds.map(function(x,i){return i<c?60:(i===c?100:25)}),pots=S.rounds.map(function(x,i){return potR(i)});
+ $('stats').innerHTML=
+  kpi('auction','k-g','&#8377;','Full pot per round',money(pot),'Auction amount',pots,'')+
+  kpi('auction','k-p','#','Round '+(c+1)+' of '+N,tk,'Auction on '+fmt(rdate(c))+(ci.dec?' · got '+money(ci.A):''),prog,'')+
+  kpi('payments','k-b','&#10003;','Collected this round',money(got),'Cash '+money(cc)+' · GPay '+money(cg),RC,'')+
+  kpi('payments','k-a','!','Balance this round',money(due),'Still to collect',RB,due>0?'bad':'ok')+
+  kpi('payments','k-r','&#8987;','Total pending',money(totP),'All decided rounds',MP,totP>0?'bad':'ok');
+ var mx=Math.max.apply(null,MP)||1,ch='<div class="card"><h3>Collection by round</h3><p class="sub">Collected vs expected for each auction</p>';
+ for(r=0;r<N;r++){var tt=RC[r]+RB[r];ch+='<div class="br" data-go="payments"><span>R'+(r+1)+' · '+rdate(r).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</span><u><s style="width:'+(tt?Math.round(RC[r]/tt*100):0)+'%"></s></u><span>'+money(RC[r])+'</span></div>'}
+ ch+='</div>';
+ var tc=cash+gpay,pc=tc?Math.round(cash/tc*100):0;
+ ch+='<div class="card"><h3>Cash vs GPay</h3><p class="sub">How payments have been received</p><div class="donut" style="background:'+(tc?'conic-gradient(var(--g) 0 '+pc+'%,#0ea5e9 '+pc+'% 100%)':'var(--bd)')+'"><div><span>'+money(tc)+'<small>collected</small></span></div></div><div class="leg"><span><i style="background:var(--g)"></i>Cash '+money(cash)+'</span><span><i style="background:#0ea5e9"></i>GPay '+money(gpay)+'</span></div></div>';
+ ch+='<div class="card"><h3>Pending by member</h3><p class="sub">Outstanding across all decided rounds</p>';
+ for(m=0;m<N;m++)ch+='<div class="br" data-go="payments"><span style="overflow:hidden;text-overflow:ellipsis">'+esc(S.names[m])+'</span><u><s class="am" style="width:'+Math.round(MP[m]/mx*100)+'%"></s></u><span>'+money(MP[m])+'</span></div>';
+ ch+='</div>';
+ $('charts').innerHTML=ch;
+
+ var mh='<tr><th>#</th><th>Member name</th><th>Contact number</th><th>Takes in round</th></tr>';
+ for(m=0;m<N;m++){var cr=-1;for(r=0;r<N;r++)if(S.rounds[r].t===m)cr=r;
+  var ro='<option value="">&mdash; not yet &mdash;</option>';
+  for(r=0;r<N;r++){var by=S.rounds[r].t,dis=by>=0&&by!==m;ro+='<option value="'+r+'"'+(cr===r?' selected':'')+(dis?' disabled':'')+'>Round '+(r+1)+' · '+fmt(rdate(r))+(dis?' (taken by '+esc(S.names[by])+')':'')+'</option>'}
+  mh+='<tr><td>'+(m+1)+'</td><td><input type="text" data-n="'+m+'" value="'+esc(S.names[m])+'" placeholder="Member name"></td><td><input type="tel" data-ph="'+m+'" value="'+esc((S.phones||[])[m]||'')+'" placeholder="Contact number"></td><td><select data-mr="'+m+'">'+ro+'</select></td></tr>'}
+ $('mem').innerHTML=mh;
+}
+document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
+ if(t.id==='amt'){S.amt=Math.max(0,+t.value||0);S.rounds.forEach(function(x){x.p='';x.f='';x.b='';x.pm='';x.pt=''});S.over={}}
+ else if(t.id==='freq')S.freq=t.value;
+ else if(t.id==='share')S.share=t.value;
+ else if(t.id==='start'&&t.value)S.start=t.value;
+ else if(d.t!==undefined){S.rounds[d.t].t=t.value===''?-1:+t.value;if(t.value==='')S.rounds[d.t].a=''}
+ else if(d.a!==undefined){S.rounds[d.a].a=t.value;S.rounds[d.a].p='';S.rounds[d.a].b=''}
+ else if(d.p!==undefined)S.rounds[d.p].p=t.value;
+ else if(d.f!==undefined)S.rounds[d.f].f=t.value;
+ else if(d.b!==undefined)S.rounds[d.b].b=t.value;
+ else if(d.o!==undefined){if(t.value==='')delete S.over[d.o];else S.over[d.o]=t.value}
+ else if(d.d!==undefined)S.mode[d.d]=t.value;
+ else if(d.cm!==undefined){for(var mm=0;mm<N;mm++)S.mode[mm+'-'+d.cm]=t.value}
+ else if(d.pt!==undefined){var Rr=S.rounds[d.pt];Rr.pt=t.value;Rr.p='';Rr.b=''}
+ else if(d.pm!==undefined){var R2=S.rounds[d.pm];R2.pm=t.value;R2.p='';R2.f='';R2.b='';for(var m2=0;m2<N;m2++)delete S.over[m2+'-'+d.pm]}
+ else if(d.m!==undefined)S.paid[d.m+'-'+d.r]=t.checked;
+ else if(d.mr!==undefined){var mq=+d.mr;S.rounds.forEach(function(x){if(x.t===mq){x.t=-1;x.a=''}});if(t.value!=='')S.rounds[+t.value].t=mq}
+ else if(d.ph!==undefined)S.phones[d.ph]=t.value.replace(/[^0-9+\s-]/g,'');
+ else if(d.n!==undefined)S.names[d.n]=t.value||('Member '+(+d.n+1));
+ else return;
+ save();render()});
+document.getElementById('reset').onclick=function(){
+ if(!confirm('Clear all names, auctions and payments?'))return;S=ST[MODE]=def(MODE);save();render()};
+render();if(!fromHash())route();
+</script>
+</body>
+</html>

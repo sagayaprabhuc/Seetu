@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Seettu Tracker</string>
+    <string name="title_activity_main">Seettu Tracker</string>
+    <string name="package_name">com.yourname.seettu</string>
+    <string name="custom_url_scheme">com.yourname.seettu</string>
+</resources>
