@@ -20,11 +20,21 @@ body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg));color:var(-
 #app{display:flex;flex-direction:column;min-height:100vh}
 aside{order:2;background:linear-gradient(180deg,var(--sb1) 0%,var(--sb2) 100%);color:#e6f4ed;padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));position:sticky;bottom:0;display:flex;overflow-x:auto;gap:4px;border-top:1px solid rgba(255,255,255,.08);z-index:50;-webkit-overflow-scrolling:touch}
 .logo{display:none}
-aside a{flex:none;display:flex;align-items:center;justify-content:center;white-space:nowrap;padding:12px 14px;border-radius:8px;color:#d5e8df;text-decoration:none;margin:0;min-height:44px;font-size:13px;transition:background .2s ease}
+aside a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;white-space:normal;text-align:center;padding:7px 2px;border-radius:12px;color:#d5e8df;text-decoration:none;margin:0;min-height:48px;font-size:10.5px;font-weight:600;line-height:1.15;transition:background .2s ease}
+aside a::before{font-size:19px;line-height:1}
+aside a[data-go="dashboard"]::before{content:"\1F4CA"}
+aside a[data-go="members"]::before{content:"\1F465"}
+aside a[data-go="auction"]::before{content:"\1F528"}
+aside a[data-go="payments"]::before{content:"\1F4B0"}
+aside a[data-go="whatsapp"]::before{content:"\1F4AC"}
+aside a[data-go="setup"]::before{content:"\2699\FE0F"}
+aside a[data-go="home"]{display:none}
 aside a:active{background:rgba(255,255,255,.14)}
 aside a.on{background:var(--g);color:#fff}
 .top{display:flex;gap:10px;align-items:center;padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:40}
 .top b{font-size:14px}.sp{flex:1}
+.swm{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;border:1px solid var(--hb);background:var(--pg);color:var(--gd);font-weight:600;font-size:12px;text-decoration:none;white-space:nowrap}
+#app.home .swm{display:none}
 .av{width:32px;height:32px;border-radius:50%;background:var(--ch);color:#fff;display:grid;place-items:center;font-weight:600;font-size:11px;flex:none}
 main{padding:14px;padding-bottom:28px;min-width:0;order:1;flex:1}
 h2{margin:24px 0 2px;font-size:18px}
@@ -40,32 +50,41 @@ button:active{border-color:var(--g)}
 .stats{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
 .stat b{font-size:22px;display:block;line-height:1.2}
 .stat span{font-size:12px;color:var(--mu)}
-.wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;background:var(--card);-webkit-overflow-scrolling:touch}
+.wrap{overflow:visible;border:0;background:transparent;border-radius:0}
 table{border-collapse:collapse;width:100%}
-#sched{min-width:1000px}#grid{min-width:1400px}
-th,td{padding:10px 12px;border-bottom:1px solid var(--bd);text-align:center;white-space:nowrap}
-th{font-size:12px;color:var(--mu);font-weight:600;background:var(--card)}
-td:first-child,th:first-child{text-align:left}
-tr:last-child td{border-bottom:0}
-tr.now td{background:var(--hl);box-shadow:inset 0 0 0 0 transparent}
-td input[type=text],td input[type=number],td select{min-width:110px;min-height:40px}
-td input[type=checkbox]{width:24px;height:24px;accent-color:var(--g);padding:0}
+#sched,#mem{min-width:0;display:block;width:100%}
+#sched tbody,#mem tbody{display:block}
+#sched tr:first-child,#mem tr:first-child{display:none}
+#sched tr,#mem tr{display:block;background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:6px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+#sched tr.now{border-color:var(--g);box-shadow:0 0 0 2px var(--gl)}
+#sched tr.now td{background:transparent}
+#sched td,#mem td{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--bd);text-align:right;white-space:normal}
+#sched td:last-child,#mem td:last-child{border-bottom:0}
+#sched td::before,#mem td::before{content:attr(data-label);flex:none;max-width:46%;font-size:12px;font-weight:600;color:var(--mu);text-align:left}
+#sched td:first-child{font-weight:700;font-size:16px;color:var(--gd)}
+#sched td:first-child::before{color:var(--mu);font-weight:600;font-size:12px}
+#sched td select,#mem td select{min-width:0;width:auto;flex:1;max-width:62%;min-height:40px}
+#mem td input{min-width:0;flex:1;max-width:62%;text-align:right;min-height:40px}
+td input[type=text],td input[type=number]{min-height:40px}
 td small{display:block;font-size:11px;color:var(--mu)}
-td input.amt{width:88px;min-width:88px;padding:5px 6px;text-align:right;min-height:36px}
+td input.amt{width:120px;min-width:0;padding:5px 6px;text-align:right;min-height:36px}
 td input.ov{border-color:var(--am)}
 .pc{display:flex;gap:4px;align-items:center;justify-content:center;margin-bottom:4px}
-td select.md{width:72px;min-width:72px;padding:3px 4px;font-size:12px;min-height:34px}
+td select.md{width:82px;min-width:0;padding:3px 4px;font-size:12px;min-height:34px}
 .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
 .bar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
-.bar button{width:auto}
-@media(hover:hover){aside a:hover{background:rgba(255,255,255,.1);transform:translateX(2px)}button:hover{border-color:var(--g)}tr:hover td{background:var(--pg)}}
+.bar button{width:auto;flex:1}
+@media(hover:hover){aside a:hover{background:rgba(255,255,255,.1)}button:hover{border-color:var(--g)}tr:hover td{background:var(--pg)}}
 @media(min-width:800px){
 #app{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
 aside{order:0;position:sticky;top:0;bottom:auto;height:100vh;padding:18px 12px;flex-direction:column;overflow-x:visible;border-top:none;border-right:1px solid rgba(255,255,255,.08)}
 .logo{display:flex;font-weight:700;font-size:18px;gap:8px;align-items:center;color:#fff;margin:0 8px 26px;min-height:40px}
 .logo img{width:28px;height:28px;border-radius:7px;display:block}
 .avlogo{width:32px;height:32px;border-radius:50%;flex:none}
-aside a{display:block;justify-content:flex-start;padding:11px 13px;margin-bottom:4px;min-height:auto}
+aside a{flex:none;flex-direction:row;justify-content:flex-start;gap:10px;white-space:nowrap;text-align:left;padding:11px 13px;margin-bottom:4px;min-height:auto;font-size:13px}
+aside a::before{font-size:16px}
+aside a[data-go="home"]{display:block}
+.swm{display:none}
 .top{padding:12px 24px}
 .top b{font-size:15px}
 .av{width:34px;height:34px;font-size:12px}
@@ -74,7 +93,27 @@ h2{margin:28px 0 2px;font-size:20px}
 .card{padding:16px}
 .row{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 button{width:auto}
+.bar button{flex:none}
 .stats{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.wrap{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;background:var(--card);-webkit-overflow-scrolling:touch}
+#sched{min-width:1000px}
+#sched,#mem{display:table}
+#sched tbody,#mem tbody{display:table-row-group}
+#sched tr:first-child,#mem tr:first-child{display:table-row}
+#sched tr,#mem tr{display:table-row;background:none;border:0;border-radius:0;padding:0;margin-bottom:0;box-shadow:none}
+#sched tr.now{box-shadow:none}
+#sched tr.now td{background:var(--hl)}
+#sched td,#mem td{display:table-cell;text-align:center;padding:10px 12px;border-bottom:1px solid var(--bd);white-space:nowrap}
+#sched td::before,#mem td::before{content:none}
+td:first-child,th:first-child{text-align:left}
+#sched td:first-child{font-weight:400;font-size:inherit;color:inherit}
+th{font-size:12px;color:var(--mu);font-weight:600;background:var(--card);padding:10px 12px;border-bottom:1px solid var(--bd)}
+tr:last-child td{border-bottom:0}
+#sched td select,#mem td select{min-width:110px;width:100%;max-width:none}
+#mem td input{min-width:200px;max-width:none}
+#mem{min-width:760px}#mem td select{min-width:300px}
+td input[type=checkbox]{width:24px;height:24px;accent-color:var(--g);padding:0}
+@media(hover:hover){tr:hover td{background:var(--pg)}}
 }
 
 [hidden]{display:none!important}
@@ -139,13 +178,30 @@ aside a{cursor:pointer}
 .swatches{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
 .swb{width:34px;height:34px;padding:0;border-radius:50%;border:3px solid var(--card);box-shadow:0 0 0 1px var(--bd)}
 .swb.on{box-shadow:0 0 0 2px var(--tx)}
-#mem{min-width:760px}#mem td select{min-width:300px}#mem td input{min-width:200px;text-align:left}
 
 .backbtn{width:40px;height:40px;min-height:0;flex:none;border-radius:50%;display:grid;place-items:center;font-size:18px;padding:0;background:var(--card);border:1px solid var(--bd)}
 .watpl{font:inherit;font-size:14px;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:8px;padding:10px;width:100%;resize:vertical;white-space:pre-wrap;min-height:220px}
 .toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(12px);background:var(--ch);color:#fff;padding:10px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;box-shadow:0 8px 20px rgba(0,0,0,.25)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 @media(min-width:800px){.toast{bottom:24px}}
+
+.rounds{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:14px;align-items:start}
+.rc{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.rc.now{border-color:var(--g);box-shadow:0 0 0 2px var(--gl)}
+.rh{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.rh h3{margin:0;font-size:19px;color:var(--gd)}
+.rh small{color:var(--mu);font-size:12px}
+.rs{text-align:right}.rs b{font-size:18px;display:block;line-height:1.1}.rs small{font-size:11px}
+.rbar{height:6px;border-radius:4px;background:var(--bd);margin:10px 0 4px;overflow:hidden}
+.rbar s{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g2));border-radius:4px;text-decoration:none}
+.pr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid var(--bd)}
+.pn{min-width:0}
+.pn b{display:block;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pn input.amt{margin-top:3px;width:84px;min-width:0;padding:3px 6px;font-size:12px;text-align:left}
+.pr select{width:auto;min-width:0;font-size:13.5px;font-weight:600;padding:9px 10px;min-height:40px}
+select.st.yes{background-color:#dcfce7;border-color:#86efac;color:#166534}
+select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.rf{display:flex;justify-content:space-between;padding-top:10px;font-size:13px;color:var(--mu)}
 </style>
 </head>
 <body>
@@ -162,7 +218,7 @@ aside a{cursor:pointer}
   <a href="#" data-go="home" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px">&#8646; Switch weekly / monthly</a>
 </aside>
 <div>
-<div class="top"><button id="backBtn" class="backbtn" aria-label="Back" hidden>&#8592;</button><b id="topt">Seettu Tracker</b><span class="sp"></span>
+<div class="top"><button id="backBtn" class="backbtn" aria-label="Back" hidden>&#8592;</button><b id="topt">Seettu Tracker</b><a href="#" class="swm" data-go="home">&#8646; Switch</a><span class="sp"></span>
   <div style="text-align:right;line-height:1.2"><b>10 members</b><br><small id="topsub" style="color:var(--mu)">Weekly &amp; monthly</small></div><div class="av">S10</div></div>
 <main>
 
@@ -218,12 +274,12 @@ aside a{cursor:pointer}
   <div class="hero">
     <span class="eyebrow"><i></i>PAYMENTS</span>
     <h1>Payment <b>Tracker</b></h1>
-    <p>Tick when a member has paid and choose Cash or GPay for each payment.</p>
+    <p>For every week, set each member to Paid or Not paid and choose Cash or GPay.</p>
     <span class="pill"><i></i>10 members</span>
     <div class="chip c1">CASH <i></i></div><div class="chip c2">GPAY <i></i></div>
   </div>
-  <p class="sub">Type any amount in a member&rsquo;s box to change what they owe for that round (clear it to go back to automatic).</p>
-  <div class="wrap"><table id="grid"></table></div>
+  <p class="sub">Each card is one week (or month). Edit the small amount under a name if it differs; clear it to go back to the automatic value.</p>
+  <div id="rounds" class="rounds"></div>
 </section>
 
 <section id="v-whatsapp" class="view" hidden>
@@ -379,15 +435,15 @@ function render(){
    '<td>'+pays+'</td><td>'+money(col)+'<small>Cash '+money(ca)+' · GPay '+money(gp)+'</small></td>'+
    '<td><input type="number" class="amt'+(has(R.b)?' ov':'')+((has(R.b)?+R.b:bal)>0?' bad':' ok')+'" data-b="'+r+'" value="'+Math.round(has(R.b)?+R.b:bal)+'"></td></tr>'}
  $('sched').innerHTML=h;
- var g='<tr><th>Member</th>';
- for(r=0;r<N;r++)g+='<th>R'+(r+1)+'<br><small>'+rdate(r).toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</small></th>';
- g+='<th>Pending ₹</th></tr>';
- for(m=0;m<N;m++){var pend=0;
-  g+='<tr><td><input type="text" data-n="'+m+'" value="'+esc(S.names[m])+'"></td>';
-  for(r=0;r<N;r++){var pp=pay(m,r),pd=S.paid[m+'-'+r];if(!pd&&(info(r).dec||has(S.over[m+'-'+r])))pend+=pp;
-   var md=S.mode[m+'-'+r]==='gpay';g+='<td><div class="pc"><input type="checkbox" data-m="'+m+'" data-r="'+r+'"'+(pd?' checked':'')+'><select class="md" data-d="'+m+'-'+r+'"><option value="cash"'+(md?'':' selected')+'>Cash</option><option value="gpay"'+(md?' selected':'')+'>GPay</option></select></div><input type="number" class="amt'+(has(S.over[m+'-'+r])?' ov':'')+'" data-o="'+m+'-'+r+'" value="'+Math.round(pp)+'"></td>'}
-  g+='<td class="'+(pend>0?'bad':'ok')+'">'+(pend>0?money(pend):'Clear')+'</td></tr>'}
- $('grid').innerHTML=g;
+ var wk=S.freq==='monthly'?'Month':'Week',rh='';
+ for(r=0;r<N;r++){var rcol=0,rbal=0,paidN=0,ii=info(r),tkn=S.rounds[r].t>=0?esc(S.names[S.rounds[r].t]):'',rows='';
+  for(m=0;m<N;m++){var kk2=m+'-'+r,pq=pay(m,r),isP=!!S.paid[kk2],isG=S.mode[kk2]==='gpay',ov=has(S.over[kk2]);
+   if(isP){rcol+=pq;paidN++}else if(ii.dec||ov)rbal+=pq;
+   rows+='<div class="pr"><div class="pn"><b>'+esc(S.names[m])+'</b><input type="number" class="amt'+(ov?' ov':'')+'" data-o="'+kk2+'" value="'+Math.round(pq)+'" aria-label="Amount"></div>'+
+    '<select class="st '+(isP?'yes':'no')+'" data-pd="'+kk2+'" aria-label="Paid status"><option value="no"'+(isP?'':' selected')+'>Not paid</option><option value="paid"'+(isP?' selected':'')+'>Paid</option></select>'+
+    '<select class="md" data-d="'+kk2+'" aria-label="Cash or GPay"><option value="cash"'+(isG?'':' selected')+'>Cash</option><option value="gpay"'+(isG?' selected':'')+'>GPay</option></select></div>'}
+  rh+='<div class="rc'+(r===c?' now':'')+'"><div class="rh"><div><h3>'+wk+' '+(r+1)+'</h3><small>'+fmt(rdate(r))+(tkn?' · Took: '+tkn:'')+'</small></div><div class="rs"><b>'+paidN+'/'+N+'</b><small>paid</small></div></div><div class="rbar"><s style="width:'+(paidN/N*100)+'%"></s></div>'+rows+'<div class="rf"><span>Collected <b class="ok">'+money(rcol)+'</b></span><span>Balance <b class="'+(rbal>0?'bad':'ok')+'">'+money(rbal)+'</b></span></div></div>'}
+ $('rounds').innerHTML=rh;
 
  var RC=[],RB=[],MP=[],totC=0,totP=0,cash=0,gpay=0;
  for(m=0;m<N;m++)MP[m]=0;
@@ -416,7 +472,9 @@ function render(){
   mh+='<tr><td>'+(m+1)+'</td><td><input type="text" data-n="'+m+'" value="'+esc(S.names[m])+'" placeholder="Member name"></td><td><input type="tel" data-ph="'+m+'" value="'+esc((S.phones||[])[m]||'')+'" placeholder="Contact number"></td><td><select data-mr="'+m+'">'+ro+'</select></td></tr>'}
  $('mem').innerHTML=mh;
  renderWA();
+ labelTables();
 }
+function labelTables(){['sched','mem'].forEach(function(id){var t=document.getElementById(id);if(!t||!t.rows.length)return;var hs=t.rows[0].cells,lb=[],i,r,c;for(i=0;i<hs.length;i++){var th=hs[i],sm=th.querySelector('small');lb.push((th.childNodes[0]?th.childNodes[0].textContent:'')+(sm?' · '+sm.textContent:''))}for(r=1;r<t.rows.length;r++){var cs=t.rows[r].cells;for(c=0;c<cs.length;c++)cs[c].setAttribute('data-label',lb[c]||'')}})}
 function waResolvedMsg(r){var R=S.rounds[r],taken=R.t>=0?S.names[R.t]:'—',i=info(r);
  var pay=Math.round(i.grp.length?amtR(r)-i.div:amtR(r)),amt=Math.round(amtR(r));
  return "Week :- "+ENORD[r]+" week\nAuction amount :- "+amt+"\nTaken by : "+taken+"\nSeetu Amount : "+pay+"\nLast date to pay : "+fmt(dueDate(r))+"\n\n"+TAORD[r]+" வாரம்.\nஏல தொகை : "+amt+" \nசீட்டு தொகை : "+pay+" \nஏலம் எடுத்து : "+taken}
@@ -442,7 +500,7 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  else if(d.cm!==undefined){for(var mm=0;mm<N;mm++)S.mode[mm+'-'+d.cm]=t.value}
  else if(d.pt!==undefined){var Rr=S.rounds[d.pt];Rr.pt=t.value;Rr.p='';Rr.b=''}
  else if(d.pm!==undefined){var R2=S.rounds[d.pm];R2.pm=t.value;R2.p='';R2.f='';R2.b='';for(var m2=0;m2<N;m2++)delete S.over[m2+'-'+d.pm]}
- else if(d.m!==undefined)S.paid[d.m+'-'+d.r]=t.checked;
+ else if(d.pd!==undefined)S.paid[d.pd]=(t.value==='paid');
  else if(d.mr!==undefined){var mq=+d.mr;S.rounds.forEach(function(x){if(x.t===mq){x.t=-1;x.a=''}});if(t.value!=='')S.rounds[+t.value].t=mq}
  else if(d.ph!==undefined)S.phones[d.ph]=t.value.replace(/[^0-9+\s-]/g,'');
  else if(d.n!==undefined)S.names[d.n]=t.value||('Member '+(+d.n+1));
