@@ -24,6 +24,7 @@ aside a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center
 aside a::before{font-size:19px;line-height:1}
 aside a[data-go="dashboard"]::before{content:"\1F4CA"}
 aside a[data-go="members"]::before{content:"\1F465"}
+aside a[data-go="contacts"]::before{content:"\1F4C7"}
 aside a[data-go="auction"]::before{content:"\1F528"}
 aside a[data-go="payments"]::before{content:"\1F4B0"}
 aside a[data-go="whatsapp"]::before{content:"\1F4AC"}
@@ -74,6 +75,12 @@ td select.md{width:82px;min-width:0;padding:3px 4px;font-size:12px;min-height:34
 .ok{color:var(--ok);font-weight:600}.bad{color:var(--bad);font-weight:600}
 .bar{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
 .bar button{width:auto;flex:1}
+.crow{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px}
+.crow small{color:var(--mu);font-size:12px}
+.crow button{width:auto}
+@media(min-width:800px){.crow{grid-template-columns:1.2fr 1fr 1.2fr auto;align-items:end}}
+.savebtn{width:auto;min-height:36px;padding:6px 12px;font-size:12px;font-weight:700;background:var(--g);border-color:var(--g);color:#fff;white-space:nowrap;flex:none}
+.savebtn:hover{border-color:var(--gd);background:var(--gd)}
 @media(hover:hover){aside a:hover{background:rgba(255,255,255,.1)}button:hover{border-color:var(--g)}tr:hover td{background:var(--pg)}}
 @media(min-width:800px){
 #app{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
@@ -211,6 +218,7 @@ select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
   <div class="mbadge" id="mbadge"></div>
   <a href="#" data-go="dashboard" class="on">Dashboard</a>
   <a href="#" data-go="members">Members</a>
+  <a href="#" data-go="contacts">Contacts</a>
   <a href="#" data-go="auction">Auction &amp; Balance</a>
   <a href="#" data-go="payments">Payment Tracker</a>
   <a href="#" data-go="whatsapp">WhatsApp</a>
@@ -218,7 +226,7 @@ select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
   <a href="#" data-go="home" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px">&#8646; All seettus</a>
 </aside>
 <div>
-<div class="top"><button id="backBtn" class="backbtn" aria-label="Back" hidden>&#8592;</button><b id="topt">Seettu Tracker</b><a href="#" class="swm" data-go="home">&#8646; Switch</a><span class="sp"></span>
+<div class="top"><button id="backBtn" class="backbtn" aria-label="Back" hidden>&#8592;</button><b id="topt">Seettu Tracker</b><a href="#" class="swm" data-go="home">&#8646; Switch</a><span class="sp"></span><button type="button" class="savebtn js-savefile" title="Save all data to data.json">&#128190; Save</button>
   <div style="text-align:right;line-height:1.2"><b>10 members</b><br><small id="topsub" style="color:var(--mu)">Weekly &amp; monthly</small></div><div class="av">S10</div></div>
 <main>
 <div id="stwarn" class="card" hidden style="border-color:var(--bad);margin-bottom:14px"><b class="bad">Data is NOT being saved</b><div class="sub" style="margin:4px 0 0">Your browser is blocking storage (private/incognito mode or site data blocked). Open this file in a normal window, and use Settings &rarr; Download backup to keep your data safe.</div></div>
@@ -257,6 +265,26 @@ select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
     <div class="chip c1">NAME <i></i></div><div class="chip c2">CONTACT <i></i></div>
   </div>
   <div class="wrap"><table id="mem"></table></div>
+  <div class="bar"><button type="button" data-go="contacts">&#128199; Manage contacts</button></div>
+</section>
+
+<section id="v-contacts" class="view" hidden>
+  <div class="hero">
+    <span class="eyebrow"><i></i>CONTACTS</span>
+    <h1>Your <b>Contacts</b></h1>
+    <p>Keep everyone&rsquo;s name and phone number here, then pick them from the dropdown on the Members page. Members you add are saved here automatically.</p>
+    <span class="pill"><i></i><span id="ccount">0 contacts</span></span>
+  </div>
+  <div class="card">
+    <div class="row">
+      <div><label>Name</label><input id="cNewName" type="text" placeholder="Full name"></div>
+      <div><label>Phone number</label><input id="cNewPh" type="tel" placeholder="Phone number"></div>
+    </div>
+    <div class="bar"><button type="button" id="cAdd" style="background:var(--g);border-color:var(--g);color:#fff;font-weight:700">+ Add contact</button></div>
+  </div>
+  <div class="sec" style="margin-top:18px"><div><h2>All contacts</h2></div></div>
+  <input id="cSearch" type="search" placeholder="Search name or number" style="margin-bottom:12px">
+  <div id="clist"></div>
 </section>
 
 <section id="v-auction" class="view" hidden>
@@ -320,7 +348,7 @@ select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
     <div class="bar"><button id="reset">Reset all</button><button id="delSeettu" type="button" hidden style="color:var(--bad);border-color:var(--bad)">Delete this seettu</button></div>
   </div>
   <div class="card" style="margin-top:14px"><label>Theme colour</label><div class="swatches" id="swatches"><button class="swb" data-theme-pick="red" style="background:#dc2626" title="Red" aria-label="Red theme"></button><button class="swb" data-theme-pick="indigo" style="background:#6366f1" title="Indigo" aria-label="Indigo theme"></button><button class="swb" data-theme-pick="blue" style="background:#2563eb" title="Blue" aria-label="Blue theme"></button><button class="swb" data-theme-pick="purple" style="background:#9333ea" title="Purple" aria-label="Purple theme"></button><button class="swb" data-theme-pick="rose" style="background:#e11d48" title="Rose" aria-label="Rose theme"></button><button class="swb" data-theme-pick="orange" style="background:#f97316" title="Orange" aria-label="Orange theme"></button><button class="swb" data-theme-pick="green" style="background:#269B55" title="Green" aria-label="Green theme"></button></div></div>
-  <div class="card" style="margin-top:14px"><label>Backup (all seettus)</label><p class="sub" style="margin:0 0 10px">Download a copy of all your data, and restore it on any browser or device.</p><div class="bar" style="margin-top:0"><button type="button" id="bkBtn">Download backup</button><button type="button" id="restoreBtn">Restore backup</button></div><input type="file" id="restoreFile" accept=".json,application/json" hidden></div>
+  <div class="card" style="margin-top:14px"><label>Backup (all seettus)</label><p class="sub" style="margin:0 0 10px">Download a copy of all your data, and restore it on any browser or device.</p><div class="bar" style="margin-top:0"><button type="button" class="js-savefile" style="background:var(--g);border-color:var(--g);color:#fff;font-weight:700">&#128190; Save to data.json</button><button type="button" id="bkBtn">Download backup</button><button type="button" id="restoreBtn">Restore backup</button></div><input type="file" id="restoreFile" accept=".json,application/json" hidden></div>
 </section>
 
 <p class="sub" style="margin-top:18px">Data is saved in this browser only. Amounts are rounded to the nearest rupee for display.</p>
@@ -347,6 +375,8 @@ function loadList(){var l=null,i,has={};try{l=JSON.parse(localStorage.getItem('s
  return l}
 var LIST=loadList(),ST={},S;
 LIST.forEach(function(x){ST[x.id]=loadMode(x.id,x.freq)});S=ST.weekly;
+var CONTACTS=loadContacts();
+syncContacts();
 function saveList(){try{localStorage.setItem('seettu-list',JSON.stringify(LIST))}catch(e){}}
 function nameOf(id){for(var i=0;i<LIST.length;i++)if(LIST[i].id===id)return LIST[i].name;return ''}
 function addSeettu(f){var k=2,cnt=0,id;while(ST[f+k])k++;id=f+k;LIST.forEach(function(x){if(x.freq===f)cnt++});
@@ -354,7 +384,7 @@ function addSeettu(f){var k=2,cnt=0,id;while(ST[f+k])k++;id=f+k;LIST.forEach(fun
  LIST.push({id:id,freq:f,name:name});ST[id]=def(f);saveList();
  try{localStorage.setItem('seettu-'+id,JSON.stringify(ST[id]))}catch(e){}
  toast(name+' added');go('setup',id)}
-function save(){try{localStorage.setItem('seettu-'+MODE,JSON.stringify(S))}catch(e){}}
+function save(){syncContacts();try{localStorage.setItem('seettu-'+MODE,JSON.stringify(S))}catch(e){}}
 function esc(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
 function money(n){return '₹'+Math.round(n).toLocaleString('en-IN')}
 function rdate(r){var d=new Date(S.start+'T00:00:00');
@@ -380,7 +410,7 @@ function pay(m,r){var k=m+'-'+r;if(has(S.over[k]))return +S.over[k];
  return amtR(r)-(g?i.div:0)}
 function mb(a){var x=Math.max.apply(null,a)||1;return '<div class="mb">'+a.map(function(v){return '<i style="height:'+Math.max(10,Math.round(v/x*100))+'%"></i>'}).join('')+'</div>'}
 function kpi(go,cls,ico,label,val,sub,arr,vc){return '<div class="kpi card '+cls+'" data-go="'+go+'"><span class="ico">'+ico+'</span><div><small>'+label+'</small><b class="'+vc+'">'+val+'</b><em>'+sub+'</em></div>'+mb(arr)+'</div>'}
-var VIEWS=['home','dashboard','members','auction','payments','whatsapp','setup'],CUR='home';
+var VIEWS=['home','dashboard','members','contacts','auction','payments','whatsapp','setup'],CUR='home';
 function withS(st,fn){var o=S;S=st;try{return fn()}finally{S=o}}
 function totals(){var c=cur(),col=0,pen=0,r,m;for(r=0;r<N;r++){var dc=info(r).dec;for(m=0;m<N;m++){var q=pay(m,r),k=m+'-'+r;if(S.paid[k])col+=q;else if(dc||has(S.over[k]))pen+=q}}
  return {c:c,col:col,pen:pen,pot:S.amt*N,tk:S.rounds[c].t>=0?S.names[S.rounds[c].t]:'Not decided',date:rdate(c)}}
@@ -406,7 +436,7 @@ function route(){document.getElementById('app').className=CUR==='home'?'home':''
 function setMode(f){MODE=f;S=ST[f];render()}
 function keyOf(v,f){return v==='home'?'home':f+'-'+v}
 function applyKey(key){if(key==='home'){MODE=null;CUR='home';return true}
- var m=/^((?:weekly|monthly)[0-9]*)-(dashboard|members|auction|payments|whatsapp|setup)$/.exec(key);if(!m||!ST[m[1]])return false;
+ var m=/^((?:weekly|monthly)[0-9]*)-(dashboard|members|contacts|auction|payments|whatsapp|setup)$/.exec(key);if(!m||!ST[m[1]])return false;
  MODE=m[1];S=ST[MODE];CUR=m[2];return true}
 var NAVSTACK=['home'];
 function go(v,f){if(VIEWS.indexOf(v)<0)return;if(v!=='home'){if(!f)f=MODE;if(!f)return}
@@ -488,10 +518,11 @@ function render(){
  for(m=0;m<N;m++){var cr=-1;for(r=0;r<N;r++)if(S.rounds[r].t===m)cr=r;
   var ro='<option value="">&mdash; not yet &mdash;</option>';
   for(r=0;r<N;r++){var by=S.rounds[r].t,dis=by>=0&&by!==m;ro+='<option value="'+r+'"'+(cr===r?' selected':'')+(dis?' disabled':'')+'>Round '+(r+1)+' · '+fmt(rdate(r))+(dis?' (taken by '+esc(S.names[by])+')':'')+'</option>'}
-  mh+='<tr><td>'+(m+1)+'</td><td><input type="text" data-n="'+m+'" value="'+esc(S.names[m])+'" placeholder="Member name"></td><td><input type="tel" data-ph="'+m+'" value="'+esc((S.phones||[])[m]||'')+'" placeholder="Contact number"></td><td><select data-mr="'+m+'">'+ro+'</select></td></tr>'}
+  mh+='<tr><td>'+(m+1)+'</td><td>'+contactSel(m)+'</td><td><input type="tel" data-ph="'+m+'" value="'+esc((S.phones||[])[m]||'')+'" placeholder="Contact number"></td><td><select data-mr="'+m+'">'+ro+'</select></td></tr>'}
  $('mem').innerHTML=mh;
  renderWA();
  labelTables();
+ renderContacts();
 }
 function labelTables(){['sched','mem'].forEach(function(id){var t=document.getElementById(id);if(!t||!t.rows.length)return;var hs=t.rows[0].cells,lb=[],i,r,c;for(i=0;i<hs.length;i++){var th=hs[i],sm=th.querySelector('small');lb.push((th.childNodes[0]?th.childNodes[0].textContent:'')+(sm?' · '+sm.textContent:''))}for(r=1;r<t.rows.length;r++){var cs=t.rows[r].cells;for(c=0;c<cs.length;c++)cs[c].setAttribute('data-label',lb[c]||'')}})}
 function waResolvedMsg(r){var R=S.rounds[r],taken=R.t>=0?S.names[R.t]:'—',i=info(r);
@@ -522,7 +553,11 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  else if(d.pm!==undefined){var R2=S.rounds[d.pm];R2.pm=t.value;R2.p='';R2.f='';R2.b='';for(var m2=0;m2<N;m2++)delete S.over[m2+'-'+d.pm]}
  else if(d.pd!==undefined)S.paid[d.pd]=(t.value==='paid');
  else if(d.mr!==undefined){var mq=+d.mr;S.rounds.forEach(function(x){if(x.t===mq){x.t=-1;x.a=''}});if(t.value!=='')S.rounds[+t.value].t=mq}
- else if(d.ph!==undefined)S.phones[d.ph]=t.value.replace(/[^0-9+\s-]/g,'');
+ else if(d.cn!==undefined){var ci2=t.value===''?-1:+t.value;if(ci2<0){S.names[d.cn]='Member '+(+d.cn+1);S.phones[d.cn]=''}else{var cc2=CONTACTS[ci2];if(cc2){S.names[d.cn]=cc2.name;S.phones[d.cn]=cc2.phone||''}}}
+ else if(d.cname!==undefined){var cx=CONTACTS[+d.cname],nn=t.value.trim();
+  if(cx&&nn&&nn!==cx.name){var ex=findContact(nn);if(ex&&ex!==cx)toast('A contact with that name already exists');else{var on=cx.name;LIST.forEach(function(x){var s3=ST[x.id];if(s3)s3.names.forEach(function(n3,k3){if(lc(n3)===lc(on))s3.names[k3]=nn})});cx.name=nn;saveContacts();saveAll()}}}
+ else if(d.cph!==undefined){var cy=CONTACTS[+d.cph];if(cy){var np=t.value.replace(/[^0-9+\s-]/g,'').trim();cy.phone=np;LIST.forEach(function(x){var s4=ST[x.id];if(!s4)return;s4.names.forEach(function(n4,k4){if(lc(n4)===lc(cy.name)){s4.phones=s4.phones||[];s4.phones[k4]=np}})});saveContacts();saveAll()}}
+ else if(d.ph!==undefined){S.phones[d.ph]=t.value.replace(/[^0-9+\s-]/g,'');var ck=findContact(S.names[d.ph]);if(ck){ck.phone=S.phones[d.ph];saveContacts()}}
  else if(d.n!==undefined)S.names[d.n]=t.value||('Member '+(+d.n+1));
  else if(t.id==='waRound'){WAR=+t.value;S.waMsg='';save();render();return}
  else if(t.id==='waMsg'){S.waMsg=t.value;save();return}
@@ -541,12 +576,12 @@ document.getElementById('waShare').onclick=function(){
  if(!msg.trim()){toast('Message is empty');return}
  S.waMsg=msg;save();
  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')};
-function saveAll(){LIST.forEach(function(x){try{localStorage.setItem('seettu-'+x.id,JSON.stringify(ST[x.id]))}catch(e){}});saveList()}
+function saveAll(){syncContacts();LIST.forEach(function(x){try{localStorage.setItem('seettu-'+x.id,JSON.stringify(ST[x.id]))}catch(e){}});saveList()}
 function flush(){try{var a=document.activeElement;if(a&&a.blur&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))a.blur()}catch(e){}saveAll()}
 window.addEventListener('pagehide',flush);
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush()});
 document.getElementById('bkBtn').onclick=function(){
- var o={v:1,list:LIST,data:ST,saved:new Date().toISOString()},b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');
+ var o={v:1,list:LIST,contacts:CONTACTS,data:ST,saved:new Date().toISOString()},b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');
  a.href=URL.createObjectURL(b);a.download='seettu-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();
  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);toast('Backup downloaded')};
 document.getElementById('restoreBtn').onclick=function(){document.getElementById('restoreFile').click()};
@@ -557,13 +592,120 @@ document.getElementById('restoreFile').addEventListener('change',function(){
   nl.forEach(function(x){var s=Object.assign(def(x.freq),o.data[x.id]||{});s.freq=x.freq;ns[x.id]=s});
   if(!ns.weekly||!ns.monthly)throw 0;
   if(!confirm('Replace all current data with this backup?'))return;
-  LIST=nl;ST=ns;S=ST.weekly;saveAll();NAVSTACK=['home'];CUR='home';MODE=null;try{location.hash='home'}catch(e){}
+  LIST=nl;ST=ns;S=ST.weekly;CONTACTS=cleanContacts(o.contacts);saveAll();NAVSTACK=['home'];CUR='home';MODE=null;try{location.hash='home'}catch(e){}
   render();route();toast('Backup restored')}catch(e){toast('Invalid backup file')}};
  rd.readAsText(f);inp.value=''});
+/* ===== Save to / load from data.json ===== */
+function dataPayload(){return JSON.stringify({v:1,list:LIST,contacts:CONTACTS,data:ST,saved:new Date().toISOString()},null,2)}
+function applyData(o){
+ try{
+  if(!o||!Array.isArray(o.list)||!o.data)throw 0;
+  var nl=o.list.filter(function(x){return x&&/^(weekly|monthly)[0-9]*$/.test(x.id)&&(x.freq==='weekly'||x.freq==='monthly')}),ns={};
+  nl.forEach(function(x){var s=Object.assign(def(x.freq),o.data[x.id]||{});s.freq=x.freq;ns[x.id]=s});
+  if(!ns.weekly||!ns.monthly)throw 0;
+  LIST=nl;ST=ns;S=ST.weekly;CONTACTS=cleanContacts(o.contacts);saveAll();NAVSTACK=['home'];CUR='home';MODE=null;try{location.hash='home'}catch(e){}
+  render();route();return true
+ }catch(e){return false}}
+function capFS(){try{var C=window.Capacitor;return(C&&C.isNativePlatform&&C.isNativePlatform()&&C.Plugins&&C.Plugins.Filesystem)||null}catch(e){return null}}
+function idbOpen(){return new Promise(function(res,rej){var q=indexedDB.open('seettu-fs',1);q.onupgradeneeded=function(){q.result.createObjectStore('h')};q.onsuccess=function(){res(q.result)};q.onerror=function(){rej(q.error)}})}
+function idbGet(k){return idbOpen().then(function(db){return new Promise(function(res){var r=db.transaction('h').objectStore('h').get(k);r.onsuccess=function(){res(r.result)};r.onerror=function(){res(null)}})})}
+function idbSet(k,v){return idbOpen().then(function(db){return new Promise(function(res){var t=db.transaction('h','readwrite');t.objectStore('h').put(v,k);t.oncomplete=function(){res()};t.onerror=function(){res()}})})}
+function downloadJSON(txt){var b=new Blob([txt],{type:'application/json'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download='data.json';document.body.appendChild(a);a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+/* Android app (Capacitor Filesystem plugin) */
+function writeCap(fs,txt){
+ var ask=(fs.requestPermissions?fs.requestPermissions().catch(function(){}):Promise.resolve());
+ return ask.then(function(){return fs.writeFile({path:'data.json',data:txt,directory:'DOCUMENTS',encoding:'utf8'})})
+  .then(function(){return 'Documents/data.json'},function(){
+   return fs.writeFile({path:'data.json',data:txt,directory:'DATA',encoding:'utf8'}).then(function(){return 'app storage (data.json)'})})}
+/* Desktop Chrome / Edge: pick data.json once, then it saves straight into it */
+function writeFSA(txt){
+ return idbGet('fh').catch(function(){return null}).then(function(h){
+  if(!h)return null;
+  return h.queryPermission({mode:'readwrite'}).then(function(st){
+   return st==='granted'?h:h.requestPermission({mode:'readwrite'}).then(function(s2){return s2==='granted'?h:null})}).catch(function(){return null})
+ }).then(function(h){
+  if(h)return h;
+  return window.showSaveFilePicker({suggestedName:'data.json',types:[{description:'JSON file',accept:{'application/json':['.json']}}]}).then(function(nh){idbSet('fh',nh).catch(function(){});return nh})
+ }).then(function(h){return h.createWritable().then(function(w){return w.write(txt).then(function(){return w.close()})}).then(function(){return h.name})})}
+function saveToFile(){
+ try{var a=document.activeElement;if(a&&a.blur)a.blur()}catch(e){}
+ saveAll();
+ var txt=dataPayload(),stamp=JSON.parse(txt).saved,fs=capFS();
+ function done(where){try{localStorage.setItem('seettu-filestamp',stamp)}catch(e){}toast('Saved to '+where)}
+ function fallback(){downloadJSON(txt);done('Downloads/data.json')}
+ if(fs)return writeCap(fs,txt).then(done,fallback);
+ if(/^https?:/.test(location.protocol))return fetch('/__save',{method:'POST',body:txt}).then(function(r){if(!r.ok)throw 0;done('www/data.json')}).catch(function(){if(window.showSaveFilePicker)return writeFSA(txt).then(done,function(e){if(e&&e.name==='AbortError')toast('Save cancelled');else fallback()});fallback()});
+ if(window.showSaveFilePicker)return writeFSA(txt).then(done,function(e){if(e&&e.name==='AbortError')toast('Save cancelled');else fallback()});
+ fallback()}
+Array.prototype.forEach.call(document.querySelectorAll('.js-savefile'),function(b){b.addEventListener('click',saveToFile)});
+function readSources(){
+ var fs=capFS(),jobs=[];
+ if(fs)['DOCUMENTS','DATA'].forEach(function(d){
+  jobs.push(fs.readFile({path:'data.json',directory:d,encoding:'utf8'}).then(function(r){return JSON.parse(r.data)}).catch(function(){return null}))});
+ jobs.push(fetch('data.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null}));
+ return Promise.all(jobs)}
+function autoLoad(){
+ readSources().then(function(all){
+  var best=null;
+  all.forEach(function(o){if(o&&Array.isArray(o.list)&&o.data&&o.saved&&(!best||o.saved>best.saved))best=o});
+  if(!best)return;
+  var stamp=null,has=false;
+  try{stamp=localStorage.getItem('seettu-filestamp');has=!!localStorage.getItem('seettu-list')}catch(e){}
+  if(stamp&&best.saved<=stamp)return;
+  if(has&&!confirm('A saved data.json ('+new Date(best.saved).toLocaleString()+') was found. Load it and replace the current data?')){
+   try{localStorage.setItem('seettu-filestamp',best.saved)}catch(e){}return}
+  if(applyData(best)){try{localStorage.setItem('seettu-filestamp',best.saved)}catch(e){}toast('Data loaded from data.json')}
+ }).catch(function(){})}
+/* ===== Contacts ===== */
+function lc(x){return String(x==null?'':x).trim().toLowerCase()}
+function cleanContacts(a){var out=[],seen={};(Array.isArray(a)?a:[]).forEach(function(c){if(!c||typeof c.name!=='string')return;var n=c.name.trim(),k=lc(n);if(!n||seen[k])return;seen[k]=1;out.push({name:n,phone:String(c.phone||'')})});return out}
+function loadContacts(){var a=null;try{a=JSON.parse(localStorage.getItem('seettu-contacts'))}catch(e){}return cleanContacts(a)}
+function saveContacts(){try{localStorage.setItem('seettu-contacts',JSON.stringify(CONTACTS))}catch(e){}}
+function findContact(n){n=lc(n);if(!n)return null;for(var i=0;i<CONTACTS.length;i++)if(lc(CONTACTS[i].name)===n)return CONTACTS[i];return null}
+function syncContacts(){var ch=false;
+ LIST.forEach(function(x){var s=ST[x.id];if(!s||!s.names)return;s.names.forEach(function(n,k){
+  if(!n||/^Member \d+$/.test(n))return;
+  var ph=(s.phones||[])[k]||'',c=findContact(n);
+  if(!c){CONTACTS.push({name:n.trim(),phone:ph});ch=true}
+  else if(!c.phone&&ph){c.phone=ph;ch=true}})});
+ if(ch)saveContacts()}
+function contactSel(m){var cn=lc(S.names[m]),sel=-1,h='';
+ CONTACTS.forEach(function(c,i){if(lc(c.name)===cn)sel=i});
+ h+='<option value="">'+(CONTACTS.length?'&mdash; Select contact &mdash;':'&mdash; No contacts yet &mdash;')+'</option>';
+ CONTACTS.forEach(function(c,i){var used=S.names.some(function(n,k){return k!==m&&lc(n)===lc(c.name)});
+  h+='<option value="'+i+'"'+(sel===i?' selected':'')+(used?' disabled':'')+'>'+esc(c.name)+(c.phone?' \u00b7 '+esc(c.phone):'')+(used?' (already added)':'')+'</option>'});
+ return '<select data-cn="'+m+'">'+h+'</select>'}
+function seettusOf(name){var inn=[];LIST.forEach(function(x){var s=ST[x.id];if(s&&s.names&&s.names.some(function(n){return lc(n)===lc(name)}))inn.push(x.name)});return inn}
+function renderContacts(){var box=document.getElementById('clist');if(!box)return;
+ var q=lc((document.getElementById('cSearch')||{}).value),h='',n=0;
+ CONTACTS.forEach(function(c,i){
+  if(q&&lc(c.name).indexOf(q)<0&&String(c.phone||'').indexOf(q)<0)return;n++;
+  var inn=seettusOf(c.name);
+  h+='<div class="card crow"><div><label>Name</label><input type="text" data-cname="'+i+'" value="'+esc(c.name)+'"></div><div><label>Phone</label><input type="tel" data-cph="'+i+'" value="'+esc(c.phone||'')+'" placeholder="Phone number"></div><small>'+(inn.length?'In: '+esc(inn.join(', ')):'Not in any seettu')+'</small><button type="button" data-cdel="'+i+'" style="color:var(--bad);border-color:var(--bad)">Delete</button></div>'});
+ if(!n)h='<p class="sub">'+(CONTACTS.length?'No contacts match your search.':'No contacts yet. Add one above.')+'</p>';
+ box.innerHTML=h;
+ var cc=document.getElementById('ccount');if(cc)cc.textContent=CONTACTS.length+(CONTACTS.length===1?' contact':' contacts')}
+document.getElementById('cAdd').onclick=function(){
+ var nm=document.getElementById('cNewName').value.trim(),ph=document.getElementById('cNewPh').value.replace(/[^0-9+\s-]/g,'').trim();
+ if(!nm){toast('Enter a name');return}
+ if(findContact(nm)){toast('Contact already exists');return}
+ CONTACTS.push({name:nm,phone:ph});saveContacts();
+ document.getElementById('cNewName').value='';document.getElementById('cNewPh').value='';
+ render();toast('Contact added')};
+document.getElementById('cSearch').addEventListener('input',renderContacts);
+document.getElementById('clist').addEventListener('click',function(e){
+ var b=e.target.closest('[data-cdel]');if(!b)return;var i=+b.dataset.cdel,c=CONTACTS[i];if(!c)return;
+ var inn=seettusOf(c.name);
+ if(inn.length){toast('Used in '+inn[0]+' - change that member first');return}
+ if(!confirm('Delete '+c.name+'?'))return;
+ CONTACTS.splice(i,1);saveContacts();render()});
 var STOK=true;try{localStorage.setItem('seettu-t','1');STOK=localStorage.getItem('seettu-t')==='1';localStorage.removeItem('seettu-t')}catch(e){STOK=false}
 if(!STOK)document.getElementById('stwarn').hidden=false;
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 render();if(!fromHash())route();
+autoLoad();
 </script>
 </body>
 </html>
