@@ -215,22 +215,23 @@ select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
   <a href="#" data-go="payments">Payment Tracker</a>
   <a href="#" data-go="whatsapp">WhatsApp</a>
   <a href="#" data-go="setup">Settings</a>
-  <a href="#" data-go="home" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px">&#8646; Switch weekly / monthly</a>
+  <a href="#" data-go="home" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.12);border-radius:0 0 8px 8px">&#8646; All seettus</a>
 </aside>
 <div>
 <div class="top"><button id="backBtn" class="backbtn" aria-label="Back" hidden>&#8592;</button><b id="topt">Seettu Tracker</b><a href="#" class="swm" data-go="home">&#8646; Switch</a><span class="sp"></span>
   <div style="text-align:right;line-height:1.2"><b>10 members</b><br><small id="topsub" style="color:var(--mu)">Weekly &amp; monthly</small></div><div class="av">S10</div></div>
 <main>
+<div id="stwarn" class="card" hidden style="border-color:var(--bad);margin-bottom:14px"><b class="bad">Data is NOT being saved</b><div class="sub" style="margin:4px 0 0">Your browser is blocking storage (private/incognito mode or site data blocked). Open this file in a normal window, and use Settings &rarr; Download backup to keep your data safe.</div></div>
 
 <section id="v-home" class="view">
   <div class="hero">
     <span class="eyebrow"><i></i>SEETTU</span>
     <h1>Seettu <b>Management</b></h1>
-    <p>Choose which seettu you want to manage. Weekly and monthly seettus are tracked separately.</p>
-    <span class="pill"><i></i>10 members each</span>
+    <p>Choose which seettu you want to manage. You can run as many weekly and monthly seettus as you like &mdash; each is tracked separately.</p>
+    <span class="pill"><i></i>Add extra weekly &amp; monthly</span>
     <div class="chip c1">WEEKLY <i></i></div><div class="chip c2">MONTHLY <i></i></div><div class="chip c3">&#10003; TRACKED</div>
   </div>
-  <div class="sec"><div><h2>Choose your seettu</h2><p class="sub">Select one to open its dashboard</p></div></div>
+  <div class="sec"><div><h2>Your seettus</h2><p class="sub">Select one to open its dashboard, or add another below</p></div></div>
   <div class="charts home2" id="homeCards"></div>
 </section>
 
@@ -310,14 +311,16 @@ select.st.no{background-color:#fee2e2;border-color:#fca5a5;color:#991b1b}
   </div>
   <div class="card">
     <div class="row">
+      <div><label>Seettu name</label><input id="sname" type="text" maxlength="40" placeholder="e.g. Weekly Seettu 2"></div>
       <div><label>Amount per member (&#8377;)</label><input id="amt" type="number" min="0" step="100"></div>
       <div><label>Frequency</label><input id="freqv" disabled></div>
       <div><label>First auction date</label><input id="start" type="date"></div>
       <div><label>Auction discount is shared among</label><select id="share"><option value="remaining">Members yet to take</option><option value="all">All members</option></select></div>
     </div>
-    <div class="bar"><button id="reset">Reset all</button></div>
+    <div class="bar"><button id="reset">Reset all</button><button id="delSeettu" type="button" hidden style="color:var(--bad);border-color:var(--bad)">Delete this seettu</button></div>
   </div>
   <div class="card" style="margin-top:14px"><label>Theme colour</label><div class="swatches" id="swatches"><button class="swb" data-theme-pick="red" style="background:#dc2626" title="Red" aria-label="Red theme"></button><button class="swb" data-theme-pick="indigo" style="background:#6366f1" title="Indigo" aria-label="Indigo theme"></button><button class="swb" data-theme-pick="blue" style="background:#2563eb" title="Blue" aria-label="Blue theme"></button><button class="swb" data-theme-pick="purple" style="background:#9333ea" title="Purple" aria-label="Purple theme"></button><button class="swb" data-theme-pick="rose" style="background:#e11d48" title="Rose" aria-label="Rose theme"></button><button class="swb" data-theme-pick="orange" style="background:#f97316" title="Orange" aria-label="Orange theme"></button><button class="swb" data-theme-pick="green" style="background:#269B55" title="Green" aria-label="Green theme"></button></div></div>
+  <div class="card" style="margin-top:14px"><label>Backup (all seettus)</label><p class="sub" style="margin:0 0 10px">Download a copy of all your data, and restore it on any browser or device.</p><div class="bar" style="margin-top:0"><button type="button" id="bkBtn">Download backup</button><button type="button" id="restoreBtn">Restore backup</button></div><input type="file" id="restoreFile" accept=".json,application/json" hidden></div>
 </section>
 
 <p class="sub" style="margin-top:18px">Data is saved in this browser only. Amounts are rounded to the nearest rupee for display.</p>
@@ -335,8 +338,22 @@ var ENORD=['First','Second','Third','Fourth','Fifth','Sixth','Seventh','Eighth',
 var TAORD=['முதல்','இரண்டாம்','மூன்றாம்','நான்காம்','ஐந்தாம்','ஆறாம்','ஏழாம்','எட்டாம்','ஒன்பதாம்','பத்தாம்'];
 function def(f){var n=[],R=[];for(var i=0;i<N;i++){n.push('Member '+(i+1));R.push({t:-1,a:'',p:'',f:'',b:''})}
  return {amt:1000,freq:f||'weekly',share:'remaining',start:new Date().toISOString().slice(0,10),names:n,phones:n.map(function(){return ''}),rounds:R,paid:{},over:{},mode:{},waMsg:''}}
-function loadMode(f){var x=def(f),raw=null;try{raw=localStorage.getItem('seettu-'+f);if(!raw&&f==='weekly')raw=localStorage.getItem('seettu-v2');if(raw)x=Object.assign(def(f),JSON.parse(raw))}catch(e){}x.freq=f;return x}
-var ST={weekly:loadMode('weekly'),monthly:loadMode('monthly')},S=ST.weekly;
+function loadMode(id,f){var x=def(f),raw=null;try{raw=localStorage.getItem('seettu-'+id);if(!raw&&id==='weekly')raw=localStorage.getItem('seettu-v2');if(raw)x=Object.assign(def(f),JSON.parse(raw))}catch(e){}x.freq=f;return x}
+function loadList(){var l=null,i,has={};try{l=JSON.parse(localStorage.getItem('seettu-list'))}catch(e){}
+ if(!Array.isArray(l))l=[];l=l.filter(function(x){return x&&/^(weekly|monthly)[0-9]*$/.test(x.id)&&(x.freq==='weekly'||x.freq==='monthly')});
+ l.forEach(function(x){has[x.id]=1});
+ if(!has.monthly)l.unshift({id:'monthly',freq:'monthly',name:'Monthly Seettu'});
+ if(!has.weekly)l.unshift({id:'weekly',freq:'weekly',name:'Weekly Seettu'});
+ return l}
+var LIST=loadList(),ST={},S;
+LIST.forEach(function(x){ST[x.id]=loadMode(x.id,x.freq)});S=ST.weekly;
+function saveList(){try{localStorage.setItem('seettu-list',JSON.stringify(LIST))}catch(e){}}
+function nameOf(id){for(var i=0;i<LIST.length;i++)if(LIST[i].id===id)return LIST[i].name;return ''}
+function addSeettu(f){var k=2,cnt=0,id;while(ST[f+k])k++;id=f+k;LIST.forEach(function(x){if(x.freq===f)cnt++});
+ var name=(f==='weekly'?'Weekly':'Monthly')+' Seettu '+(cnt+1);
+ LIST.push({id:id,freq:f,name:name});ST[id]=def(f);saveList();
+ try{localStorage.setItem('seettu-'+id,JSON.stringify(ST[id]))}catch(e){}
+ toast(name+' added');go('setup',id)}
 function save(){try{localStorage.setItem('seettu-'+MODE,JSON.stringify(S))}catch(e){}}
 function esc(x){return String(x).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
 function money(n){return '₹'+Math.round(n).toLocaleString('en-IN')}
@@ -367,19 +384,20 @@ var VIEWS=['home','dashboard','members','auction','payments','whatsapp','setup']
 function withS(st,fn){var o=S;S=st;try{return fn()}finally{S=o}}
 function totals(){var c=cur(),col=0,pen=0,r,m;for(r=0;r<N;r++){var dc=info(r).dec;for(m=0;m<N;m++){var q=pay(m,r),k=m+'-'+r;if(S.paid[k])col+=q;else if(dc||has(S.over[k]))pen+=q}}
  return {c:c,col:col,pen:pen,pot:S.amt*N,tk:S.rounds[c].t>=0?S.names[S.rounds[c].t]:'Not decided',date:rdate(c)}}
-function renderHome(){var h='';['weekly','monthly'].forEach(function(f){var W=f==='weekly',s=ST[f],t=withS(s,totals),nm=W?'Weekly':'Monthly';
+function renderHome(){var h='';LIST.forEach(function(it){var f=it.id,W=it.freq==='weekly',s=ST[f],t=withS(s,totals),nm=esc(it.name);
  function row(a,b,c){return '<div class="hrow"><span>'+a+'</span><b'+(c?' class="'+c+'"':'')+'>'+b+'</b></div>'}
- h+='<div class="card hc" data-mode="'+f+'"><div class="'+(W?'k-g':'k-b')+'" style="display:flex;gap:14px;align-items:center;margin-bottom:12px"><span class="ico">'+(W?'W':'M')+'</span><div><h3>'+nm+' Seettu</h3><div class="sub" style="margin:0">Auction every '+(W?'week':'month')+'</div></div></div>'+
+ h+='<div class="card hc" data-mode="'+f+'"><div class="'+(W?'k-g':'k-b')+'" style="display:flex;gap:14px;align-items:center;margin-bottom:12px"><span class="ico">'+(W?'W':'M')+'</span><div><h3>'+nm+'</h3><div class="sub" style="margin:0">Auction every '+(W?'week':'month')+'</div></div></div>'+
   row('Amount per member',money(s.amt))+row('Pot per round',money(t.pot))+row('Current round','Round '+(t.c+1)+' of '+N)+row('Took this round',esc(t.tk))+row('Auction date',fmt(t.date))+row('Collected so far',money(t.col),'ok')+row('Pending',money(t.pen),t.pen>0?'bad':'ok')+
-  '<button class="go">Open '+nm+' dashboard &rarr;</button></div>'});
+  '<button class="go">Open dashboard &rarr;</button></div>'});
+ h+='<div class="card" style="border-style:dashed"><h3 style="margin:0;font-size:19px">Add another seettu</h3><div class="sub" style="margin:4px 0 0">Run extra weekly or monthly seettus &mdash; each one is tracked separately.</div><div class="bar" style="margin-top:14px"><button type="button" class="go" style="margin-top:0" data-add="weekly">+ Weekly seettu</button><button type="button" class="go" style="margin-top:0" data-add="monthly">+ Monthly seettu</button></div></div>';
  document.getElementById('homeCards').innerHTML=h}
-function applyMode(){var n=MODE==='monthly'?'Monthly':'Weekly';
+function applyMode(){var n=S.freq==='monthly'?'Monthly':'Weekly',nmv=nameOf(MODE)||(n+' Seettu');
  [].forEach.call(document.querySelectorAll('.mn'),function(e){e.textContent=n});
  [].forEach.call(document.querySelectorAll('.mnu'),function(e){e.textContent=n.toUpperCase()});
- document.getElementById('topt').textContent=n+' Seettu';
- document.getElementById('topsub').textContent='Auction every '+(MODE==='monthly'?'month':'week');
+ document.getElementById('topt').textContent=nmv;
+ document.getElementById('topsub').textContent='Auction every '+(S.freq==='monthly'?'month':'week');
  document.getElementById('freqv').value=n;
- document.getElementById('mbadge').textContent=n+' seettu'}
+ document.getElementById('mbadge').textContent=nmv}
 function route(){document.getElementById('app').className=CUR==='home'?'home':'';
  VIEWS.forEach(function(v){document.getElementById('v-'+v).hidden=v!==CUR;var a=document.querySelector('aside a[data-go="'+v+'"]');if(a)a.classList.toggle('on',v===CUR)});
  if(CUR==='home'){renderHome();document.getElementById('topt').textContent='Seettu Tracker';document.getElementById('topsub').textContent='Weekly & monthly'}else applyMode();
@@ -388,7 +406,7 @@ function route(){document.getElementById('app').className=CUR==='home'?'home':''
 function setMode(f){MODE=f;S=ST[f];render()}
 function keyOf(v,f){return v==='home'?'home':f+'-'+v}
 function applyKey(key){if(key==='home'){MODE=null;CUR='home';return true}
- var m=/^(weekly|monthly)-(dashboard|members|auction|payments|whatsapp|setup)$/.exec(key);if(!m)return false;
+ var m=/^((?:weekly|monthly)[0-9]*)-(dashboard|members|auction|payments|whatsapp|setup)$/.exec(key);if(!m||!ST[m[1]])return false;
  MODE=m[1];S=ST[MODE];CUR=m[2];return true}
 var NAVSTACK=['home'];
 function go(v,f){if(VIEWS.indexOf(v)<0)return;if(v!=='home'){if(!f)f=MODE;if(!f)return}
@@ -413,9 +431,10 @@ window.addEventListener('hashchange',fromHash);
 document.getElementById('backBtn').addEventListener('click',backNav);
 try{if(window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.App&&window.Capacitor.Plugins.App.addListener){
  window.Capacitor.Plugins.App.addListener('backButton',function(){backNav()})}}catch(e){}
-document.addEventListener('click',function(e){var tp=e.target.closest('[data-theme-pick]');if(tp){applyTheme(tp.dataset.themePick);return}var d=e.target.closest('[data-mode]');if(d){e.preventDefault();go('dashboard',d.dataset.mode);return}var g=e.target.closest('[data-go]');if(!g)return;e.preventDefault();go(g.dataset.go)});
+document.addEventListener('click',function(e){var tp=e.target.closest('[data-theme-pick]');if(tp){applyTheme(tp.dataset.themePick);return}var ad=e.target.closest('[data-add]');if(ad){addSeettu(ad.dataset.add);return}var d=e.target.closest('[data-mode]');if(d){e.preventDefault();go('dashboard',d.dataset.mode);return}var g=e.target.closest('[data-go]');if(!g)return;e.preventDefault();go(g.dataset.go)});
 function render(){
  var $=function(i){return document.getElementById(i)},pot=S.amt*N,c=cur(),m,r;
+ $('sname').value=nameOf(MODE);$('delSeettu').hidden=!MODE||MODE==='weekly'||MODE==='monthly';
  $('amt').value=S.amt;$('start').value=S.start;$('share').value=S.share;
  var ci=info(c),due=0,got=0,cc=0,cg=0;
  for(m=0;m<N;m++){var p=pay(m,c);if(S.paid[m+'-'+c]){got+=p;if(S.mode[m+'-'+c]==='gpay')cg+=p;else cc+=p}else due+=p}
@@ -489,6 +508,7 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  if(t.id==='amt'){S.amt=Math.max(0,+t.value||0);S.rounds.forEach(function(x){x.p='';x.f='';x.b='';x.pm='';x.pt=''});S.over={}}
  else if(t.id==='freq')S.freq=t.value;
  else if(t.id==='share')S.share=t.value;
+ else if(t.id==='sname'){var v=t.value.trim();for(var q=0;q<LIST.length;q++)if(LIST[q].id===MODE)LIST[q].name=v||((S.freq==='monthly'?'Monthly':'Weekly')+' Seettu');saveList();applyMode();render();return}
  else if(t.id==='start'&&t.value)S.start=t.value;
  else if(d.t!==undefined){S.rounds[d.t].t=t.value===''?-1:+t.value;if(t.value==='')S.rounds[d.t].a=''}
  else if(d.a!==undefined){S.rounds[d.a].a=t.value;S.rounds[d.a].p='';S.rounds[d.a].b=''}
@@ -509,12 +529,40 @@ document.addEventListener('change',function(e){var t=e.target,d=t.dataset;
  else return;
  save();render()});
 document.getElementById('reset').onclick=function(){
- if(!confirm('Clear all names, auctions and payments?'))return;S=ST[MODE]=def(MODE);save();render()};
+ if(!confirm('Clear all names, auctions and payments?'))return;S=ST[MODE]=def(S.freq);save();render()};
+document.getElementById('delSeettu').onclick=function(){
+ if(!MODE||MODE==='weekly'||MODE==='monthly')return;
+ if(!confirm('Delete "'+nameOf(MODE)+'" and all its data? This cannot be undone.'))return;
+ var id=MODE;LIST=LIST.filter(function(x){return x.id!==id});delete ST[id];saveList();
+ try{localStorage.removeItem('seettu-'+id)}catch(e){}
+ S=ST.weekly;NAVSTACK=['home'];CUR='home';MODE=null;try{location.hash='home'}catch(e){}render();route();toast('Seettu deleted')};
 document.getElementById('waShare').onclick=function(){
  var msg=document.getElementById('waMsg').value||'';
  if(!msg.trim()){toast('Message is empty');return}
  S.waMsg=msg;save();
  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank')};
+function saveAll(){LIST.forEach(function(x){try{localStorage.setItem('seettu-'+x.id,JSON.stringify(ST[x.id]))}catch(e){}});saveList()}
+function flush(){try{var a=document.activeElement;if(a&&a.blur&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))a.blur()}catch(e){}saveAll()}
+window.addEventListener('pagehide',flush);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flush()});
+document.getElementById('bkBtn').onclick=function(){
+ var o={v:1,list:LIST,data:ST,saved:new Date().toISOString()},b=new Blob([JSON.stringify(o)],{type:'application/json'}),a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download='seettu-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();
+ setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500);toast('Backup downloaded')};
+document.getElementById('restoreBtn').onclick=function(){document.getElementById('restoreFile').click()};
+document.getElementById('restoreFile').addEventListener('change',function(){
+ var inp=this,f=inp.files[0];if(!f)return;var rd=new FileReader();
+ rd.onload=function(){try{var o=JSON.parse(rd.result);if(!o||!Array.isArray(o.list)||!o.data)throw 0;
+  var nl=o.list.filter(function(x){return x&&/^(weekly|monthly)[0-9]*$/.test(x.id)&&(x.freq==='weekly'||x.freq==='monthly')}),ns={};
+  nl.forEach(function(x){var s=Object.assign(def(x.freq),o.data[x.id]||{});s.freq=x.freq;ns[x.id]=s});
+  if(!ns.weekly||!ns.monthly)throw 0;
+  if(!confirm('Replace all current data with this backup?'))return;
+  LIST=nl;ST=ns;S=ST.weekly;saveAll();NAVSTACK=['home'];CUR='home';MODE=null;try{location.hash='home'}catch(e){}
+  render();route();toast('Backup restored')}catch(e){toast('Invalid backup file')}};
+ rd.readAsText(f);inp.value=''});
+var STOK=true;try{localStorage.setItem('seettu-t','1');STOK=localStorage.getItem('seettu-t')==='1';localStorage.removeItem('seettu-t')}catch(e){STOK=false}
+if(!STOK)document.getElementById('stwarn').hidden=false;
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 render();if(!fromHash())route();
 </script>
 </body>
